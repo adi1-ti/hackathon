@@ -4,6 +4,8 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Register from "./pages/Register";
 import StudentProfile from "./pages/StudentProfile";
+import CareerSelection from "./pages/CareerSelection";
+import CareerGoals from "./pages/CareerGoals";
 import "./App.css";
 
 function App() {
@@ -15,6 +17,8 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/register" element={<Register />} />
         <Route path="/student-profile" element={<StudentProfile />} />
+        <Route path="/career-selection" element={<CareerSelection />} />
+        <Route path="/career-goals" element={<CareerGoals />} />
       </Routes>
     </BrowserRouter>
   );

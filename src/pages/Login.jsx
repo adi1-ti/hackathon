@@ -118,7 +118,7 @@ function Login() {
             <button
   type="button"
   className="auth-button"
-  onClick={() => navigate("/StudentProfile")}
+ onClick={() => navigate("/student-profile")}
 >Log In
   <ArrowRight size={17} />
 </button>
