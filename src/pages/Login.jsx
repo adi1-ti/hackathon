@@ -118,8 +118,12 @@ function Login() {
             <button
   type="button"
   className="auth-button"
- onClick={() => navigate("/student-profile")}
->Log In
+  onClick={() => {
+    console.log("LOGIN CLICKED");
+    navigate("/student-profile");
+  }}
+>
+  Log In
   <ArrowRight size={17} />
 </button>
 

@@ -2,270 +2,247 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowRight,
-  Sparkles,
-  Code2,
-  ShieldCheck,
-  BrainCircuit,
-  Database,
-  Cloud,
-  Palette,
-  BriefcaseBusiness,
-  Megaphone,
-  Gamepad2,
-  Smartphone,
   BarChart3,
-  Rocket,
+  BrainCircuit,
   Check,
+  Code2,
+  Palette,
+  Server,
+  ShieldCheck,
+  Sparkles,
 } from "lucide-react";
+
+import "./CareerSelection.css";
+
+const careers = [
+  {
+    id: "Frontend Developer",
+    title: "Frontend Developer",
+    description:
+      "Build modern, responsive interfaces and engaging web experiences.",
+    icon: Code2,
+    skills: "HTML • CSS • JavaScript • React",
+  },
+  {
+    id: "Backend Developer",
+    title: "Backend Developer",
+    description:
+      "Design reliable servers, APIs, databases, and backend systems.",
+    icon: Server,
+    skills: "Node.js • APIs • SQL • Authentication",
+  },
+  {
+    id: "Data Analyst",
+    title: "Data Analyst",
+    description:
+      "Turn raw data into useful insights that support better decisions.",
+    icon: BarChart3,
+    skills: "SQL • Python • Statistics • Visualization",
+  },
+  {
+    id: "UI/UX Designer",
+    title: "UI/UX Designer",
+    description:
+      "Create intuitive digital experiences centered around real users.",
+    icon: Palette,
+    skills: "Research • Wireframes • UI • Usability",
+  },
+  {
+    id: "Cybersecurity Analyst",
+    title: "Cybersecurity Analyst",
+    description:
+      "Protect systems, networks, applications, and sensitive information.",
+    icon: ShieldCheck,
+    skills: "Networking • Linux • Security • Incident Response",
+  },
+  {
+    id: "AI/ML Engineer",
+    title: "AI/ML Engineer",
+    description:
+      "Build intelligent systems using machine learning and data.",
+    icon: BrainCircuit,
+    skills: "Python • ML • Data • Neural Networks",
+  },
+];
 
 function CareerSelection() {
   const navigate = useNavigate();
+  const [selectedCareer, setSelectedCareer] = useState("");
 
-  const [selectedCareers, setSelectedCareers] = useState([]);
+  const handleCareerSelect = (career) => {
+    setSelectedCareer(career);
+  };
 
-  const careers = [
-    {
-      name: "Software Developer",
-      category: "Technology",
-      icon: Code2,
-    },
-    {
-      name: "Web Developer",
-      category: "Technology",
-      icon: Code2,
-    },
-    {
-      name: "App Developer",
-      category: "Technology",
-      icon: Smartphone,
-    },
-    {
-      name: "Cybersecurity Analyst",
-      category: "Technology",
-      icon: ShieldCheck,
-    },
-    {
-      name: "AI / ML Engineer",
-      category: "Technology",
-      icon: BrainCircuit,
-    },
-    {
-      name: "Data Scientist",
-      category: "Technology",
-      icon: Database,
-    },
-    {
-      name: "Cloud Engineer",
-      category: "Technology",
-      icon: Cloud,
-    },
-    {
-      name: "UI/UX Designer",
-      category: "Creative",
-      icon: Palette,
-    },
-    {
-      name: "Game Designer",
-      category: "Creative",
-      icon: Gamepad2,
-    },
-    {
-      name: "Content Creator",
-      category: "Creative",
-      icon: Megaphone,
-    },
-    {
-      name: "Business Analyst",
-      category: "Business",
-      icon: BarChart3,
-    },
-    {
-      name: "Product Manager",
-      category: "Business",
-      icon: BriefcaseBusiness,
-    },
-    {
-      name: "Digital Marketing",
-      category: "Business",
-      icon: Megaphone,
-    },
-    {
-      name: "Entrepreneur",
-      category: "Business",
-      icon: Rocket,
-    },
-  ];
+  const handleStartAssessment = () => {
+    if (!selectedCareer) return;
 
-  const toggleCareer = (career) => {
-    setSelectedCareers((prev) => {
-      if (prev.includes(career)) {
-        return prev.filter((item) => item !== career);
-      }
+    // Save the selected career so it can also be accessed
+    // after page navigation.
+    localStorage.setItem("selectedCareer", selectedCareer);
 
-      if (prev.length >= 3) {
-        return prev;
-      }
-
-      return [...prev, career];
+    navigate("/assessment", {
+      state: {
+        career: selectedCareer,
+      },
     });
   };
 
-  const handleContinue = (e) => {
-    e.preventDefault();
-
-    navigate("/career-goals");
-  };
-
   return (
-    <div className="career-page">
+    <div className="career-selection-page">
+
       {/* HEADER */}
-      <header className="profile-header">
-        <Link to="/" className="auth-brand">
-          <div className="brand-mark">
+      <header className="career-selection-header">
+
+        <Link to="/" className="career-brand">
+          <div className="career-brand-mark">
             <Sparkles size={18} />
           </div>
 
-          <div>
-            <span className="brand-name">CAREERPATH</span>
-            <span className="brand-subtitle">AI</span>
+          <div className="career-brand-text">
+            <span>CAREERPATH</span>
+            <small>AI</small>
           </div>
         </Link>
 
-        <div className="profile-progress-text">
-          PROFILE SETUP <span>02 / 03</span>
+        <div className="career-step">
+          CAREER SELECTION
+          <span>02 / 03</span>
         </div>
+
       </header>
 
       {/* MAIN */}
-      <main className="career-main">
-        {/* SIDEBAR */}
-        <aside className="profile-sidebar">
-          <div className="sidebar-title">
-            <span className="sidebar-kicker">YOUR JOURNEY</span>
+      <main className="career-selection-container">
 
-            <h2>
-              Discover where
-              <br />
-              <span>you could go.</span>
-            </h2>
+        {/* INTRO */}
+        <section className="career-selection-heading">
 
-            <p>
-              Your interests are a starting point. Now let's explore the
-              career directions that excite you.
-            </p>
+          <div className="career-kicker">
+            <span />
+            FIND YOUR DIRECTION
+            <span />
           </div>
 
-          <div className="setup-steps">
-            <div className="setup-step completed">
-              <div className="step-icon">
-                <Check size={17} />
-              </div>
+          <h1>
+            Choose your <em>career path.</em>
+          </h1>
 
-              <div>
-                <small>STEP 01</small>
-                <strong>About You</strong>
-              </div>
-            </div>
+          <p>
+            Select the career you want to assess your current skills for.
+          </p>
 
-            <div className="setup-line active-line" />
-
-            <div className="setup-step active">
-              <div className="step-icon">
-                <Sparkles size={17} />
-              </div>
-
-              <div>
-                <small>STEP 02</small>
-                <strong>Career Selection</strong>
-              </div>
-            </div>
-
-            <div className="setup-line" />
-
-            <div className="setup-step">
-              <div className="step-icon">
-                <Rocket size={17} />
-              </div>
-
-              <div>
-                <small>STEP 03</small>
-                <strong>Career Goals</strong>
-              </div>
-            </div>
-          </div>
-        </aside>
-
-        {/* CONTENT */}
-        <section className="career-selection-section">
-          <div className="form-heading">
-            <div className="profile-kicker">
-              <span />
-              CAREER SELECTION
-            </div>
-
-            <h1>
-              Where do you see
-              <br />
-              <span>yourself going?</span>
-            </h1>
-
-            <p>
-              Choose up to 3 career paths that interest you. You can always
-              change them later.
-            </p>
-          </div>
-
-          <form onSubmit={handleContinue}>
-            <div className="career-grid">
-              {careers.map((career) => {
-                const Icon = career.icon;
-                const selected = selectedCareers.includes(career.name);
-
-                return (
-                  <button
-                    key={career.name}
-                    type="button"
-                    className={`career-card ${
-                      selected ? "selected" : ""
-                    }`}
-                    onClick={() => toggleCareer(career.name)}
-                  >
-                    <div className="career-card-icon">
-                      <Icon size={20} />
-                    </div>
-
-                    <div className="career-card-content">
-                      <small>{career.category}</small>
-                      <strong>{career.name}</strong>
-                    </div>
-
-                    {selected && (
-                      <div className="career-check">
-                        <Check size={14} />
-                      </div>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="career-selection-footer">
-              <span>
-                {selectedCareers.length} / 3 selected
-              </span>
-
-              <button
-                type="submit"
-                className="profile-continue"
-                disabled={selectedCareers.length === 0}
-              >
-                Continue to Career Goals
-                <ArrowRight size={17} />
-              </button>
-            </div>
-          </form>
         </section>
+
+        {/* CAREER GRID */}
+        <section className="career-grid">
+
+          {careers.map((career) => {
+            const Icon = career.icon;
+            const isSelected = selectedCareer === career.id;
+
+            return (
+              <button
+                key={career.id}
+                type="button"
+                className={`career-card ${
+                  isSelected ? "career-card-selected" : ""
+                }`}
+                onClick={() => handleCareerSelect(career.id)}
+              >
+
+                {/* SELECTED CHECK */}
+                <div className="career-check">
+                  {isSelected && <Check size={14} strokeWidth={3} />}
+                </div>
+
+                {/* ICON */}
+                <div className="career-icon">
+                  <Icon size={25} strokeWidth={1.5} />
+                </div>
+
+                {/* CONTENT */}
+                <div className="career-card-content">
+
+                  <span className="career-number">
+                    {String(careers.indexOf(career) + 1).padStart(2, "0")}
+                  </span>
+
+                  <h2>{career.title}</h2>
+
+                  <p>{career.description}</p>
+
+                  <div className="career-skills">
+                    {career.skills}
+                  </div>
+
+                </div>
+
+                {/* ARROW */}
+                <div className="career-card-arrow">
+                  <ArrowRight size={18} />
+                </div>
+
+              </button>
+            );
+          })}
+
+        </section>
+
+        {/* SELECTED CAREER */}
+        <section
+          className={`selected-career ${
+            selectedCareer ? "selected-career-active" : ""
+          }`}
+        >
+
+          <div className="selected-career-info">
+
+            <span className="selected-label">
+              SELECTED CAREER
+            </span>
+
+            {selectedCareer ? (
+              <strong>{selectedCareer}</strong>
+            ) : (
+              <span className="selected-placeholder">
+                Choose a career above to continue
+              </span>
+            )}
+
+          </div>
+
+          {selectedCareer && (
+            <div className="selected-status">
+              <Check size={15} />
+              SELECTED
+            </div>
+          )}
+
+        </section>
+
+        {/* START BUTTON */}
+        <button
+          type="button"
+          className="career-start-button"
+          disabled={!selectedCareer}
+          onClick={handleStartAssessment}
+        >
+          <span>
+            {selectedCareer
+              ? `START ${selectedCareer.toUpperCase()} ASSESSMENT`
+              : "SELECT A CAREER TO CONTINUE"}
+          </span>
+
+          <ArrowRight size={18} />
+
+        </button>
+
+        <p className="assessment-note">
+          You'll answer 5 skill-based questions tailored to your selected career.
+        </p>
+
       </main>
+
     </div>
   );
 }
