@@ -1,0 +1,40 @@
+id,name,category
+1,API Development,Technical
+2,APIs & Data Integration,Technical
+3,"Authentication, Authorization & Security",Technical
+4,Backend Framework & Server Development,Technical
+5,"CSS, Layout & Responsive Design",Technical
+6,Cybersecurity Fundamentals,Technical
+7,Data Cleaning & Processing,Technical
+8,Data Processing & Analysis,Technical
+9,Data Visualization & BI Tools,Tools
+10,Data Visualization & Exploration,Technical
+11,Databases & SQL,Technical
+12,Debugging & Development Tools,Tools
+13,Deep Learning & Neural Networks,Technical
+14,Design Communication & Presentation,Soft Skill
+15,Excel & Spreadsheet Analysis,Tools
+16,Figma & Prototyping,Tools
+17,HTML & Web Semantics,Technical
+18,JavaScript,Technical
+19,Linux & System Fundamentals,Technical
+20,Machine Learning Fundamentals,Technical
+21,"Mathematics, Statistics & Probability",Technical
+22,ML Frameworks & Tools,Tools
+23,Model Training & Evaluation,Technical
+24,Networking & Network Security,Technical
+25,Programming Fundamentals,Technical
+26,Python for Data Analysis,Technical
+27,Python Programming,Technical
+28,React & Component Development,Technical
+29,Security Monitoring & Incident Response,Tools
+30,Security Scripting & Automation,Technical
+31,SQL & Database Querying,Technical
+32,Statistics & Data Interpretation,Technical
+33,"Testing, Debugging & Version Control",Tools
+34,UI Design & Visual Principles,Technical
+35,Usability Testing & UX Evaluation,Technical
+36,User Research & Problem Definition,Technical
+37,Vulnerability Assessment,Technical
+38,Web & Application Security,Technical
+39,Wireframing & Information Architecture,Technical
