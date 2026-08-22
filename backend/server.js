@@ -3,7 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const { createClient } = require("@supabase/supabase-js");
 
-dotenv.config();
+dotenv.config({ path: __dirname + "/.env" });
 
 const app = express();
 
@@ -85,6 +85,21 @@ app.get("/api/careers/:careerId/skills", async (req, res) => {
   });
 
   res.json(result);
+});
+
+// Get all assessment questions
+app.get("/api/assessments", async (req, res) => {
+  const { data, error } = await supabase
+    .from("assessments")
+    .select("*");
+
+  if (error) {
+    return res.status(500).json({
+      error: error.message
+    });
+  }
+
+  res.json(data);
 });
 
 const PORT = 5000;
