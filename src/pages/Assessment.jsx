@@ -9,7 +9,7 @@ import {
   Target,
 } from "lucide-react";
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://phoenix-hackathon.onrender.com";
 
 function Assessment() {
   const navigate = useNavigate();

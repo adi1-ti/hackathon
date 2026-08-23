@@ -95,9 +95,8 @@ function Home() {
               Login
             </Link>
 
-            <Link to="/login" className="nav-cta">
+            <Link to="/register">
               Get Started
-              <ArrowRight size={15} />
             </Link>
           </div>
 
