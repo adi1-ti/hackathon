@@ -1,15 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import {
   ArrowRight,
-  BrainCircuit,
   Check,
   Code2,
-  Database,
+  Server,
   Palette,
   ShieldCheck,
-  Sparkles,
-  Server,
+  BrainCircuit,
   BarChart3,
 } from "lucide-react";
 
@@ -34,6 +33,7 @@ const CAREERS = [
       "UI Design",
     ],
   },
+
   {
     id: "backend",
     name: "Backend Developer",
@@ -53,6 +53,7 @@ const CAREERS = [
       "Databases & SQL",
     ],
   },
+
   {
     id: "data",
     name: "Data Analyst",
@@ -70,6 +71,7 @@ const CAREERS = [
       "Pandas",
     ],
   },
+
   {
     id: "uiux",
     name: "UI/UX Designer",
@@ -87,6 +89,7 @@ const CAREERS = [
       "Usability",
     ],
   },
+
   {
     id: "cybersecurity",
     name: "Cybersecurity Analyst",
@@ -105,6 +108,7 @@ const CAREERS = [
       "Security",
     ],
   },
+
   {
     id: "aiml",
     name: "AI/ML Engineer",
@@ -157,7 +161,9 @@ function calculateMatch(interests, careerSkills) {
 
   return Math.min(
     100,
-    Math.round((uniqueMatches.length / Math.max(careerSkills.length, 1)) * 100)
+    Math.round(
+      (uniqueMatches.length / Math.max(careerSkills.length, 1)) * 100
+    )
   );
 }
 
@@ -205,14 +211,6 @@ function CareerSelection() {
 
       let studentInterests = data?.interests || [];
 
-      /*
-       * Supports both:
-       * ["HTML", "JavaScript"]
-       *
-       * and, if your Supabase column happens to contain
-       * a JSON string:
-       * '["HTML","JavaScript"]'
-       */
       if (typeof studentInterests === "string") {
         try {
           studentInterests = JSON.parse(studentInterests);
@@ -246,8 +244,6 @@ function CareerSelection() {
       match: calculateMatch(interests, career.skills),
     })).sort((a, b) => b.match - a.match);
   }, [interests]);
-
-  const recommendedCareer = careerMatches[0];
 
   function handleCareerSelect(careerId) {
     setSelectedCareer(careerId);
@@ -284,13 +280,6 @@ function CareerSelection() {
         throw new Error("Selected career was not found.");
       }
 
-      /*
-       * IMPORTANT:
-       * This assumes your students table has a column named
-       * selected_career.
-       *
-       * If your column has a different name, change it here.
-       */
       const { error: updateError } = await supabase
         .from("students")
         .update({
@@ -319,8 +308,7 @@ function CareerSelection() {
     return (
       <div className="career-selection-page">
         <div className="career-selection-container career-loading">
-          <Sparkles size={24} />
-          <p>Analyzing your interests...</p>
+          <p>Loading your career options...</p>
         </div>
       </div>
     );
@@ -329,10 +317,11 @@ function CareerSelection() {
   return (
     <div className="career-selection-page">
       <div className="career-selection-container">
+
         {/* HEADER */}
         <header className="career-selection-header">
           <div className="career-logo">
-            <Sparkles size={20} />
+            <span>CP</span>
           </div>
 
           <div>
@@ -352,8 +341,8 @@ function CareerSelection() {
           </h1>
 
           <p>
-            We've analyzed your interests and highlighted the careers that
-            match your current skill profile.
+            Explore career paths based on the interests and skills you
+            selected in your profile.
           </p>
         </section>
 
@@ -382,10 +371,6 @@ function CareerSelection() {
         <section className="career-grid">
           {careerMatches.map((career) => {
             const Icon = career.icon;
-
-            const isRecommended =
-              recommendedCareer && career.id === recommendedCareer.id;
-
             const isSelected = selectedCareer === career.id;
 
             return (
@@ -397,13 +382,6 @@ function CareerSelection() {
                 }`}
                 onClick={() => handleCareerSelect(career.id)}
               >
-                {isRecommended && (
-                  <div className="recommended-badge">
-                    <Sparkles size={13} />
-                    AI RECOMMENDED
-                  </div>
-                )}
-
                 <div className="career-card-top">
                   <div className="career-icon">
                     <Icon size={22} />
@@ -443,7 +421,9 @@ function CareerSelection() {
 
             <strong>
               {selectedCareer
-                ? CAREERS.find((career) => career.id === selectedCareer)?.name
+                ? CAREERS.find(
+                    (career) => career.id === selectedCareer
+                  )?.name
                 : "Choose a career above"}
             </strong>
           </div>
@@ -466,6 +446,7 @@ function CareerSelection() {
 
           {!saving && <ArrowRight size={17} />}
         </button>
+
       </div>
     </div>
   );
