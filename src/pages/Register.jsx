@@ -118,7 +118,7 @@ function Register() {
       alert("Account created successfully!");
 
       // Student should now choose career
-      navigate("/student-profile");
+      navigate("/login");
 
     } catch (error) {
       console.error("REGISTRATION ERROR:", error);
@@ -382,7 +382,7 @@ function Register() {
                 <ArrowRight size={17} />
               )}
             </button>
-
+              
           </form>
 
           <p className="register-text">

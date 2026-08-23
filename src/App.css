@@ -3183,29 +3183,29 @@ button {
 
 
 
-
-
-
-
-
+/* =========================================
+   STUDENT PROFILE
+   COMPACT OCEANIC / DEEP OCEAN TEAL UI
+========================================= */
 
 .profile-page {
   min-height: 100vh;
 
   background:
     radial-gradient(
-      circle at 82% 12%,
+      circle at 85% 10%,
       rgba(79, 143, 143, 0.12),
       transparent 28%
     ),
     radial-gradient(
-      circle at 10% 80%,
+      circle at 10% 85%,
       rgba(29, 94, 94, 0.06),
       transparent 28%
     ),
     #daf0f0;
 
   color: #0a2f2f;
+  padding-bottom: 35px;
 }
 
 /* =========================================
@@ -3213,40 +3213,41 @@ button {
 ========================================= */
 
 .profile-header {
-  width: min(1380px, calc(100% - 34px));
-  min-height: 70px;
+  width: min(1380px, calc(100% - 40px));
+  min-height: 62px;
 
   margin: 12px auto 0;
-  padding: 0 22px;
+  padding: 0 20px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  border: 1px solid rgba(10, 47, 47, 0.14);
-  border-radius: 14px;
+  border: 1px solid rgba(10, 47, 47, 0.13);
+  border-radius: 13px;
 
-  background: rgba(229, 242, 242, 0.82);
+  background: rgba(229, 242, 242, 0.78);
 
-  backdrop-filter: blur(15px);
+  backdrop-filter: blur(14px);
 
   box-shadow:
-    0 8px 30px rgba(10, 47, 47, 0.04);
-
-  position: relative;
-  z-index: 5;
+    0 6px 25px rgba(10, 47, 47, 0.035);
 }
+
+/* =========================================
+   PROGRESS
+========================================= */
 
 .profile-progress-text {
   color: #648585;
 
-  font-size: 9px;
+  font-size: 8px;
   letter-spacing: 2px;
   font-weight: 700;
 }
 
 .profile-progress-text span {
-  margin-left: 8px;
+  margin-left: 7px;
   color: #1d5e5e;
 }
 
@@ -3255,56 +3256,64 @@ button {
 ========================================= */
 
 .profile-main {
-  width: min(1250px, calc(100% - 60px));
-  min-height: calc(100vh - 100px);
+  width: min(1240px, calc(100% - 40px));
 
   margin: 0 auto;
 
-  display: grid;
+  padding: 28px 0 30px;
 
-  grid-template-columns: 0.72fr 1.28fr;
+  display: flex;
+  flex-direction: column;
 
-  gap: 85px;
-
-  align-items: center;
-
-  padding: 35px 0 60px;
+  gap: 28px;
 }
 
 /* =========================================
-   SIDEBAR
+   JOURNEY AREA
 ========================================= */
 
 .profile-sidebar {
-  position: relative;
-  padding: 20px 0;
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns: 0.8fr 1.2fr;
+
+  align-items: center;
+
+  gap: 45px;
 }
 
+/* =========================================
+   JOURNEY INTRO
+========================================= */
+
 .sidebar-title {
-  max-width: 390px;
-  margin-top: -420px;
+  max-width: 430px;
 }
 
 .sidebar-kicker {
   color: #1d5e5e;
 
-  font-size: 9px;
+  font-size: 8px;
+
   letter-spacing: 3px;
+
   font-weight: 700;
 }
 
 .sidebar-title h2 {
-  margin-top: 20px;
+  margin-top: 12px;
 
   font-family: "Playfair Display", Georgia, serif;
 
-  font-size: clamp(40px, 4vw, 57px);
+  font-size: clamp(32px, 3.5vw, 48px);
 
-  line-height: 1;
+  line-height: 0.98;
 
   font-weight: 600;
 
-  letter-spacing: -1.5px;
+  letter-spacing: -1.3px;
 
   color: #0a2f2f;
 }
@@ -3314,15 +3323,15 @@ button {
 }
 
 .sidebar-title p {
-  max-width: 350px;
+  max-width: 400px;
 
-  margin-top: 20px;
+  margin-top: 12px;
 
   color: #4f7777;
 
-  font-size: 13px;
+  font-size: 11px;
 
-  line-height: 1.8;
+  line-height: 1.7;
 }
 
 /* =========================================
@@ -3330,54 +3339,67 @@ button {
 ========================================= */
 
 .setup-steps {
-  margin-top: 55px;
+  width: 100%;
 
-  width: min(320px, 100%);
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding: 16px 18px;
+
+  border: 1px solid rgba(10, 47, 47, 0.11);
+
+  border-radius: 14px;
+
+  background: rgba(229, 242, 242, 0.62);
+
+  backdrop-filter: blur(10px);
 }
 
 .setup-step {
   display: flex;
+
   align-items: center;
 
-  gap: 14px;
+  gap: 9px;
+
+  flex: 1;
 }
 
 .step-icon {
-  width: 42px;
-  height: 42px;
+  width: 34px;
+  height: 34px;
 
-  flex: 0 0 42px;
+  flex: 0 0 34px;
 
   display: grid;
+
   place-items: center;
 
-  border: 1px solid rgba(10, 47, 47, 0.14);
+  border: 1px solid rgba(10, 47, 47, 0.13);
 
-  border-radius: 11px;
+  border-radius: 9px;
 
   color: #6b9292;
 
-  background: rgba(229, 242, 242, 0.65);
+  background: rgba(229, 242, 242, 0.75);
 
-  transition:
-    transform 0.25s ease,
-    border-color 0.25s ease,
-    background 0.25s ease;
-}
-
-.setup-step:hover .step-icon {
-  transform: translateY(-2px);
+  transition: 0.2s ease;
 }
 
 .setup-step.active .step-icon {
   color: #1d5e5e;
 
-  border-color: rgba(29, 94, 94, 0.42);
+  border-color: rgba(29, 94, 94, 0.4);
 
-  background: rgba(29, 94, 94, 0.07);
+  background: rgba(29, 94, 94, 0.08);
 
   box-shadow:
-    0 0 20px rgba(29, 94, 94, 0.08);
+    0 0 15px rgba(29, 94, 94, 0.07);
 }
 
 .setup-step small {
@@ -3385,9 +3407,9 @@ button {
 
   color: #8aa7a7;
 
-  font-size: 7px;
+  font-size: 6px;
 
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
 }
 
 .setup-step.active small {
@@ -3397,13 +3419,13 @@ button {
 .setup-step strong {
   display: block;
 
-  margin-top: 4px;
+  margin-top: 2px;
 
   color: #648585;
 
   font-family: "Playfair Display", Georgia, serif;
 
-  font-size: 17px;
+  font-size: 14px;
 
   font-weight: 500;
 }
@@ -3412,27 +3434,28 @@ button {
   color: #0a2f2f;
 }
 
-.setup-line {
-  width: 1px;
-  height: 32px;
+/* STEP CONNECTOR */
 
-  margin-left: 21px;
+.setup-line {
+  flex: 0 0 30px;
+
+  width: 30px;
+  height: 1px;
 
   background:
     linear-gradient(
-      to bottom,
-      rgba(29, 94, 94, 0.25),
+      to right,
+      rgba(29, 94, 94, 0.18),
       rgba(29, 94, 94, 0.04)
     );
 }
 
 /* =========================================
-   CONTENT SECTION
+   RIGHT CONTENT
 ========================================= */
 
 .profile-form-section {
   width: 100%;
-  padding: 25px 0;
 }
 
 /* =========================================
@@ -3440,19 +3463,24 @@ button {
 ========================================= */
 
 .form-heading {
-  margin-bottom: 30px;
+  text-align: center;
+
+  margin: 0 auto 22px;
+
+  max-width: 720px;
 }
 
 .profile-kicker {
   display: flex;
 
   align-items: center;
+  justify-content: center;
 
-  gap: 9px;
+  gap: 8px;
 
   color: #1d5e5e;
 
-  font-size: 9px;
+  font-size: 8px;
 
   letter-spacing: 3px;
 
@@ -3460,24 +3488,24 @@ button {
 }
 
 .profile-kicker span {
-  width: 25px;
+  width: 22px;
   height: 1px;
 
   background: #1d5e5e;
 }
 
 .form-heading h1 {
-  margin-top: 17px;
+  margin-top: 11px;
 
   font-family: "Playfair Display", Georgia, serif;
 
-  font-size: clamp(42px, 4vw, 58px);
+  font-size: clamp(35px, 4vw, 50px);
 
-  line-height: 1;
+  line-height: 0.98;
 
   font-weight: 600;
 
-  letter-spacing: -1.5px;
+  letter-spacing: -1.4px;
 
   color: #0a2f2f;
 }
@@ -3487,59 +3515,79 @@ button {
 }
 
 .form-heading p {
-  max-width: 600px;
+  max-width: 620px;
 
-  margin-top: 15px;
+  margin: 11px auto 0;
 
   color: #4f7777;
 
-  font-size: 13px;
+  font-size: 11px;
 
-  line-height: 1.75;
+  line-height: 1.65;
 }
 
 /* =========================================
-   PROFILE CARD
+   FORM
+========================================= */
+
+.profile-form {
+  width: 100%;
+}
+
+/* =========================================
+   CATEGORY GRID
+========================================= */
+
+.profile-form-section .profile-form {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 13px;
+}
+
+/* =========================================
+   CATEGORY CARD
 ========================================= */
 
 .profile-review-card {
   width: 100%;
 
-  padding: 24px;
+  padding: 17px;
 
-  margin-bottom: 18px;
+  margin: 0;
 
-  border: 1px solid rgba(10, 47, 47, 0.14);
+  border: 1px solid rgba(10, 47, 47, 0.12);
 
-  border-radius: 17px;
+  border-radius: 14px;
 
   background:
     radial-gradient(
       circle at 100% 0%,
-      rgba(29, 94, 94, 0.07),
-      transparent 32%
+      rgba(29, 94, 94, 0.055),
+      transparent 35%
     ),
-    rgba(229, 242, 242, 0.82);
+    rgba(229, 242, 242, 0.75);
 
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(10px);
 
   box-shadow:
-    0 20px 70px rgba(10, 47, 47, 0.07),
-    inset 0 0 40px rgba(29, 94, 94, 0.018);
+    0 10px 30px rgba(10, 47, 47, 0.035);
 
   transition:
-    transform 0.25s ease,
-    border-color 0.25s ease,
-    box-shadow 0.25s ease;
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .profile-review-card:hover {
   transform: translateY(-2px);
 
-  border-color: rgba(29, 94, 94, 0.20);
+  border-color: rgba(29, 94, 94, 0.18);
 
   box-shadow:
-    0 25px 75px rgba(10, 47, 47, 0.09);
+    0 15px 40px rgba(10, 47, 47, 0.055);
 }
 
 /* =========================================
@@ -3549,13 +3597,13 @@ button {
 .profile-review-header {
   display: flex;
 
-  align-items: flex-start;
-
   justify-content: space-between;
 
-  gap: 20px;
+  align-items: flex-start;
 
-  margin-bottom: 22px;
+  gap: 10px;
+
+  margin-bottom: 13px;
 }
 
 .review-kicker {
@@ -3563,108 +3611,46 @@ button {
 
   color: #1d5e5e;
 
-  font-size: 8px;
+  font-size: 6px;
 
-  letter-spacing: 2.5px;
+  letter-spacing: 2px;
 
   font-weight: 700;
 }
 
 .profile-review-header h2 {
-  margin-top: 7px;
+  margin-top: 5px;
 
   color: #0a2f2f;
 
   font-family: "Playfair Display", Georgia, serif;
 
-  font-size: 23px;
+  font-size: 16px;
 
-  line-height: 1.2;
+  line-height: 1.1;
 
   font-weight: 600;
 }
 
 .review-description {
-  margin-top: 6px;
+  margin-top: 4px;
 
   color: #6b9292;
 
-  font-size: 10px;
+  font-size: 7.5px;
 
-  line-height: 1.6;
+  line-height: 1.45;
 }
+
+/* =========================================
+   CATEGORY ICON
+========================================= */
 
 .review-header-icon {
-  width: 42px;
-  height: 42px;
+  width: 31px;
+  height: 31px;
 
-  flex: 0 0 42px;
-
-  display: grid;
-
-  place-items: center;
-
-  color: #1d5e5e;
-
-  border: 1px solid rgba(29, 94, 94, 0.20);
-
-  border-radius: 11px;
-
-  background: rgba(29, 94, 94, 0.06);
-}
-
-/* =========================================
-   PROFILE INFORMATION GRID
-========================================= */
-
-.profile-info-grid {
-  display: grid;
-
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-
-  gap: 12px;
-}
-
-.profile-info-item {
-  min-height: 78px;
-
-  display: flex;
-
-  align-items: center;
-
-  gap: 13px;
-
-  padding: 13px 14px;
-
-  border: 1px solid rgba(10, 47, 47, 0.11);
-
-  border-radius: 11px;
-
-  background: rgba(229, 242, 242, 0.56);
-
-  transition:
-    border-color 0.25s ease,
-    background 0.25s ease,
-    transform 0.25s ease;
-}
-
-.profile-info-item:hover {
-  transform: translateY(-1px);
-
-  border-color: rgba(29, 94, 94, 0.22);
-
-  background: rgba(245, 251, 251, 0.82);
-}
-
-.profile-info-item-full {
-  grid-column: 1 / -1;
-}
-
-.profile-info-icon {
-  width: 38px;
-  height: 38px;
-
-  flex: 0 0 38px;
+  flex: 0 0 31px;
 
   display: grid;
 
@@ -3672,123 +3658,32 @@ button {
 
   color: #1d5e5e;
 
-  border: 1px solid rgba(29, 94, 94, 0.15);
+  border: 1px solid rgba(29, 94, 94, 0.17);
 
-  border-radius: 10px;
+  border-radius: 8px;
 
-  background: rgba(29, 94, 94, 0.055);
-}
-
-.profile-info-content {
-  min-width: 0;
-
-  flex: 1;
-}
-
-.profile-info-content label {
-  display: block;
-
-  margin-bottom: 7px;
-
-  color: #7c9b9b;
-
-  font-size: 8px;
-
-  letter-spacing: 1px;
-
-  text-transform: uppercase;
-}
-
-.profile-info-content input,
-.profile-info-content select {
-  width: 100%;
-
-  padding: 0;
-
-  border: none;
-
-  outline: none;
-
-  color: #0a2f2f;
-
-  background: transparent;
-
-  font-family: "DM Sans", sans-serif;
-
-  font-size: 12px;
-
-  font-weight: 600;
-}
-
-.profile-info-content input::placeholder {
-  color: #8aa7a7;
-
-  opacity: 1;
-}
-
-.profile-info-content select {
-  cursor: pointer;
-
-  appearance: none;
-
-  color: #0a2f2f;
-}
-
-.profile-info-content select option {
-  color: #0a2f2f;
-
-  background: #e5f2f2;
-}
-
-.profile-info-content input:focus,
-.profile-info-content select:focus {
-  color: #1d5e5e;
+  background: rgba(29, 94, 94, 0.05);
 }
 
 /* =========================================
-   INTERESTS
-========================================= */
-
-.interests-card {
-  margin-top: 18px;
-}
-
-.selected-count {
-  flex-shrink: 0;
-
-  padding: 7px 11px;
-
-  border: 1px solid rgba(29, 94, 94, 0.18);
-
-  border-radius: 20px;
-
-  color: #1d5e5e;
-
-  background: rgba(29, 94, 94, 0.06);
-
-  font-size: 8px;
-
-  font-weight: 700;
-
-  letter-spacing: 0.8px;
-
-  white-space: nowrap;
-}
-
-/* =========================================
-   INTEREST GRID
+   SKILL GRID
 ========================================= */
 
 .interest-grid {
   display: grid;
 
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
 
-  gap: 9px;
+  gap: 6px;
 }
 
+/* =========================================
+   SKILL BUTTON
+========================================= */
+
 .interest-chip {
-  min-height: 48px;
+  min-height: 37px;
 
   display: flex;
 
@@ -3796,13 +3691,13 @@ button {
 
   justify-content: space-between;
 
-  gap: 8px;
+  gap: 6px;
 
-  padding: 10px 13px;
+  padding: 7px 9px;
 
-  border: 1px solid rgba(10, 47, 47, 0.13);
+  border: 1px solid rgba(10, 47, 47, 0.1);
 
-  border-radius: 10px;
+  border-radius: 7px;
 
   color: #4f7777;
 
@@ -3810,7 +3705,7 @@ button {
 
   font-family: "DM Sans", sans-serif;
 
-  font-size: 9px;
+  font-size: 7.5px;
 
   font-weight: 500;
 
@@ -3818,42 +3713,33 @@ button {
 
   cursor: pointer;
 
-  transition:
-    transform 0.22s ease,
-    border-color 0.22s ease,
-    color 0.22s ease,
-    background 0.22s ease,
-    box-shadow 0.22s ease;
+  transition: 0.18s ease;
 }
 
 .interest-chip:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 
-  border-color: rgba(29, 94, 94, 0.35);
+  border-color: rgba(29, 94, 94, 0.3);
 
   color: #0a2f2f;
 
-  background: rgba(245, 251, 251, 0.92);
-
-  box-shadow:
-    0 8px 20px rgba(10, 47, 47, 0.05);
+  background: rgba(245, 251, 251, 0.85);
 }
 
 .interest-chip.selected {
-  border-color: rgba(29, 94, 94, 0.58);
+  border-color: rgba(29, 94, 94, 0.55);
 
   color: #1d5e5e;
 
   background:
     linear-gradient(
       135deg,
-      rgba(79, 143, 143, 0.14),
-      rgba(29, 94, 94, 0.065)
+      rgba(79, 143, 143, 0.13),
+      rgba(29, 94, 94, 0.055)
     );
 
   box-shadow:
-    inset 0 0 18px rgba(29, 94, 94, 0.025),
-    0 6px 18px rgba(29, 94, 94, 0.07);
+    inset 0 0 12px rgba(29, 94, 94, 0.02);
 }
 
 .interest-chip.selected span {
@@ -3871,11 +3757,13 @@ button {
 ========================================= */
 
 .profile-continue {
+  grid-column: 1 / -1;
+
   width: 100%;
 
-  min-height: 52px;
+  min-height: 45px;
 
-  margin-top: 8px;
+  margin-top: 2px;
 
   display: flex;
 
@@ -3883,11 +3771,11 @@ button {
 
   justify-content: center;
 
-  gap: 10px;
+  gap: 9px;
 
   border: 1px solid #1d5e5e;
 
-  border-radius: 10px;
+  border-radius: 8px;
 
   color: #e5f2f2;
 
@@ -3900,128 +3788,115 @@ button {
 
   font-family: "DM Sans", sans-serif;
 
-  font-size: 11px;
+  font-size: 9px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.5px;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.profile-continue:hover:not(:disabled) {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 10px 25px rgba(29, 94, 94, 0.2);
+}
+
+.profile-continue:disabled {
+  opacity: 0.55;
+
+  cursor: not-allowed;
+}
+
+.profile-continue svg {
+  transition: transform 0.2s ease;
+}
+
+.profile-continue:hover:not(:disabled) svg {
+  transform: translateX(4px);
+}
+
+/* =========================================
+   SELECTED COUNT
+========================================= */
+
+.selected-count {
+  grid-column: 1 / -1;
+
+  width: fit-content;
+
+  margin: -3px 0 -2px;
+
+  padding: 6px 10px;
+
+  border: 1px solid rgba(29, 94, 94, 0.15);
+
+  border-radius: 20px;
+
+  color: #1d5e5e;
+
+  background: rgba(29, 94, 94, 0.05);
+
+  font-size: 7px;
 
   font-weight: 700;
 
   letter-spacing: 0.6px;
-
-  cursor: pointer;
-
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease,
-    filter 0.25s ease;
 }
 
-.profile-continue:hover {
-  transform: translateY(-2px);
+/* =========================================
+   LOADING
+========================================= */
 
-  filter: brightness(1.03);
+.profile-loading {
+  min-height: 100vh;
 
-  box-shadow:
-    0 12px 35px rgba(29, 94, 94, 0.26);
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  color: #1d5e5e;
 }
 
-.profile-continue:active {
-  transform: translateY(0);
-}
+.profile-loading p {
+  color: #648585;
 
-.profile-continue svg {
-  transition: transform 0.25s ease;
-}
-
-.profile-continue:hover svg {
-  transform: translateX(4px);
+  font-size: 12px;
 }
 
 /* =========================================
    TABLET
 ========================================= */
 
-@media (max-width: 1100px) {
-  .profile-main {
-    grid-template-columns: 1fr;
-
-    gap: 35px;
-
-    align-items: start;
-
-    padding: 50px 0 75px;
-  }
+@media (max-width: 1050px) {
 
   .profile-sidebar {
-    padding: 0;
+    grid-template-columns: 1fr;
+
+    gap: 20px;
   }
 
   .sidebar-title {
-    max-width: 620px;
-
-    margin-top: 0;
-  }
-
-  .sidebar-title h2 {
-    font-size: 48px;
+    max-width: 650px;
   }
 
   .sidebar-title p {
     max-width: 570px;
   }
 
-  .setup-steps {
-    display: flex;
-
-    align-items: center;
-
-    gap: 12px;
-
-    width: 100%;
-
-    margin-top: 30px;
-  }
-
-  .setup-step {
-    flex: 1;
-  }
-
-  .setup-line {
-    width: 35px;
-    height: 1px;
-
-    margin-left: 0;
-
-    background:
-      linear-gradient(
-        to right,
-        rgba(29, 94, 94, 0.25),
-        rgba(29, 94, 94, 0.04)
-      );
-  }
-
-  .profile-form-section {
-    padding: 0;
-  }
-}
-
-/* =========================================
-   SMALL TABLET
-========================================= */
-
-@media (max-width: 850px) {
-  .profile-main {
-    width: calc(100% - 40px);
-  }
-
-  .profile-info-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .profile-info-item-full {
-    grid-column: auto;
-  }
-
-  .interest-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .profile-form-section .profile-form {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -4030,111 +3905,93 @@ button {
 ========================================= */
 
 @media (max-width: 700px) {
+
+  .profile-page {
+    padding-bottom: 30px;
+  }
+
   .profile-header {
     width: calc(100% - 20px);
 
-    min-height: 64px;
+    min-height: 60px;
 
-    padding: 0 15px;
+    padding: 0 14px;
 
-    border-radius: 12px;
-  }
-
-  .profile-progress-text {
-    font-size: 8px;
+    border-radius: 11px;
   }
 
   .profile-main {
     width: calc(100% - 24px);
 
-    padding-top: 30px;
+    padding-top: 22px;
 
-    padding-bottom: 50px;
+    gap: 22px;
   }
 
   .sidebar-title h2 {
-    font-size: 40px;
+    font-size: 38px;
   }
 
   .sidebar-title p {
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .setup-steps {
     flex-direction: column;
 
-    align-items: flex-start;
+    align-items: stretch;
 
-    gap: 0;
+    gap: 7px;
+
+    padding: 12px;
   }
 
   .setup-step {
+    flex: unset;
+
     width: 100%;
   }
 
   .setup-line {
     width: 1px;
-    height: 25px;
 
-    margin-left: 20px;
+    height: 14px;
 
-    background:
-      linear-gradient(
-        to bottom,
-        rgba(29, 94, 94, 0.25),
-        rgba(29, 94, 94, 0.04)
-      );
+    margin-left: 16px;
   }
 
   .form-heading {
-    margin-bottom: 25px;
+    margin-bottom: 18px;
   }
 
   .form-heading h1 {
-    font-size: 40px;
+    font-size: 36px;
   }
 
   .form-heading p {
-    font-size: 12px;
+    font-size: 10px;
   }
 
-  .profile-form {
-    width: 100%;
+  .profile-form-section .profile-form {
+    grid-template-columns: 1fr;
   }
 
   .profile-review-card {
-    padding: 19px;
-
-    border-radius: 14px;
-  }
-
-  .profile-review-header {
-    gap: 12px;
+    padding: 15px;
   }
 
   .profile-review-header h2 {
-    font-size: 21px;
-  }
-
-  .review-header-icon {
-    width: 38px;
-    height: 38px;
-
-    flex-basis: 38px;
-  }
-
-  .selected-count {
-    padding: 6px 8px;
-  }
-
-  .interest-grid {
-    grid-template-columns: 1fr 1fr;
+    font-size: 17px;
   }
 
   .interest-chip {
-    min-height: 47px;
+    min-height: 38px;
 
-    font-size: 8.5px;
+    font-size: 8px;
+  }
+
+  .profile-continue {
+    min-height: 45px;
   }
 }
 
@@ -4143,76 +4000,21 @@ button {
 ========================================= */
 
 @media (max-width: 480px) {
-  .profile-header {
-    min-height: 60px;
-  }
 
   .profile-progress-text {
     display: none;
   }
 
-  .profile-main {
-    width: calc(100% - 20px);
-
-    padding-top: 25px;
-  }
-
   .sidebar-title h2 {
-    font-size: 36px;
-  }
-
-  .sidebar-title p {
-    font-size: 11.5px;
-
-    line-height: 1.7;
+    font-size: 34px;
   }
 
   .form-heading h1 {
-    font-size: 35px;
-  }
-
-  .profile-review-card {
-    padding: 16px;
-  }
-
-  .profile-review-header {
-    align-items: flex-start;
-  }
-
-  .profile-review-header h2 {
-    font-size: 19px;
-  }
-
-  .profile-info-item {
-    min-height: 70px;
-
-    padding: 11px;
-  }
-
-  .profile-info-icon {
-    width: 35px;
-    height: 35px;
-
-    flex-basis: 35px;
-  }
-
-  .profile-info-content input,
-  .profile-info-content select {
-    font-size: 11px;
+    font-size: 33px;
   }
 
   .interest-grid {
     grid-template-columns: 1fr;
-  }
-
-  .interest-chip {
-    min-height: 45px;
-
-    font-size: 9px;
-  }
-
-  .profile-continue {
-    min-height: 50px;
   }
 }
 
@@ -4221,16 +4023,14 @@ button {
 ========================================= */
 
 @media (prefers-reduced-motion: reduce) {
+
   .profile-review-card,
-  .profile-info-item,
   .interest-chip,
   .profile-continue,
   .step-icon {
     transition: none;
   }
 }
-
-
 
 
 

@@ -4,138 +4,146 @@ import { supabase } from "../supabaseClient";
 
 import {
   ArrowRight,
+  GraduationCap,
+  UserRound,
   Sparkles,
   Check,
   Code2,
-  Server,
   Database,
-  BrainCircuit,
-  ShieldCheck,
   Palette,
+  Cloud,
+  BarChart3,
+  ShieldCheck,
 } from "lucide-react";
 
-import "./StudentProfile.css";
 
-const interestCategories = [
-  {
-    id: "frontend",
-    title: "Frontend Development",
-    description: "Build websites and interactive user interfaces.",
-    icon: Code2,
-    skills: [
-      "HTML & Web Semantics",
-      "CSS, Layout & Responsive Design",
-      "JavaScript",
-      "React & Component Development",
-      "APIs & Data Integration",
-      "Testing, Debugging & Version Control",
-    ],
-  },
-  {
-    id: "backend",
-    title: "Backend Development",
-    description: "Build servers, APIs, databases and backend systems.",
-    icon: Server,
-    skills: [
-      "Programming Fundamentals",
-      "Backend Framework & Server Development",
-      "API Development",
-      "Databases & SQL",
-      "SQL & Database Querying",
-      "Authentication, Authorization & Security",
-      "Testing, Debugging & Version Control",
-    ],
-  },
-  {
-    id: "data",
-    title: "Data & Analytics",
-    description: "Work with data to discover insights and patterns.",
-    icon: Database,
-    skills: [
-      "Python for Data Analysis",
-      "Data Cleaning & Processing",
-      "Data Processing & Analysis",
-      "Databases & SQL",
-      "SQL & Database Querying",
-      "Statistics & Data Interpretation",
-      "Data Visualization & Exploration",
-      "Data Visualization & BI Tools",
-      "Excel & Spreadsheet Analysis",
-      "Mathematics, Statistics & Probability",
-    ],
-  },
-  {
-    id: "aiml",
-    title: "AI / Machine Learning",
-    description: "Explore machine learning, AI and intelligent systems.",
-    icon: BrainCircuit,
-    skills: [
-      "Python Programming",
-      "Machine Learning Fundamentals",
-      "Deep Learning & Neural Networks",
-      "Model Training & Evaluation",
-      "ML Frameworks & Tools",
-      "Mathematics, Statistics & Probability",
-      "Data Processing & Analysis",
-    ],
-  },
-  {
-    id: "cybersecurity",
-    title: "Cybersecurity",
-    description: "Protect systems, networks, applications and data.",
-    icon: ShieldCheck,
-    skills: [
-      "Cybersecurity Fundamentals",
-      "Linux & System Fundamentals",
-      "Networking & Network Security",
-      "Web & Application Security",
-      "Vulnerability Assessment",
-      "Security Monitoring & Incident Response",
-      "Security Scripting & Automation",
-      "Authentication, Authorization & Security",
-    ],
-  },
-  {
-    id: "uiux",
-    title: "UI / UX Design",
-    description: "Design useful, accessible and engaging experiences.",
-    icon: Palette,
-    skills: [
-      "UI Design & Visual Principles",
-      "Figma & Prototyping",
-      "Wireframing & Information Architecture",
-      "User Research & Problem Definition",
-      "Usability Testing & UX Evaluation",
-      "Design Communication & Presentation",
-    ],
-  },
-];
 
 function StudentProfile() {
   const navigate = useNavigate();
+
+  // =========================================
+  // PROFILE INTERESTS
+  // =========================================
 
   const [selectedInterests, setSelectedInterests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  // =========================================
+  // INTEREST CATEGORIES + SKILLS
+  // =========================================
+
+  const interestCategories = [
+    {
+      title: "Technology & Development",
+      description: "Build software, websites and digital products.",
+      icon: <Code2 size={20} />,
+      skills: [
+        "Web Development",
+        "App Development",
+        "Software Development",
+        "Frontend Development",
+        "Backend Development",
+        "Game Development",
+      ],
+    },
+
+    {
+      title: "Cybersecurity",
+      description: "Protect systems, networks and digital information.",
+      icon: <ShieldCheck size={20} />,
+      skills: [
+        "Cybersecurity",
+        "Ethical Hacking",
+        "Network Security",
+        "Digital Forensics",
+        "Penetration Testing",
+        "Security Analysis",
+      ],
+    },
+
+    {
+      title: "Artificial Intelligence & Data",
+      description: "Work with intelligent systems, data and analytics.",
+      icon: <BarChart3 size={20} />,
+      skills: [
+        "Artificial Intelligence",
+        "Machine Learning",
+        "Data Science",
+        "Data Analytics",
+        "Deep Learning",
+        "Natural Language Processing",
+      ],
+    },
+
+    {
+      title: "Cloud & Infrastructure",
+      description: "Work with cloud platforms and modern infrastructure.",
+      icon: <Cloud size={20} />,
+      skills: [
+        "Cloud Computing",
+        "DevOps",
+        "Cloud Security",
+        "AWS",
+        "Microsoft Azure",
+        "System Administration",
+      ],
+    },
+
+    {
+      title: "Data & Databases",
+      description: "Organize, manage and work with digital information.",
+      icon: <Database size={20} />,
+      skills: [
+        "Database Management",
+        "SQL",
+        "Data Engineering",
+        "Big Data",
+        "Data Visualization",
+        "Business Intelligence",
+      ],
+    },
+
+    {
+      title: "Design & Creativity",
+      description: "Create engaging digital experiences and visuals.",
+      icon: <Palette size={20} />,
+      skills: [
+        "UI/UX Design",
+        "Graphic Design",
+        "Product Design",
+        "Animation",
+        "Content Creation",
+        "Creative Design",
+      ],
+    },
+  ];
+
+  // =========================================
+  // LOAD EXISTING INTERESTS
+  // =========================================
+
   useEffect(() => {
-    loadInterests();
+    loadStudentInterests();
   }, []);
 
-  const loadInterests = async () => {
+  const loadStudentInterests = async () => {
     try {
       setLoading(true);
 
+      // Check logged-in user
       const {
         data: { user },
         error: authError,
       } = await supabase.auth.getUser();
 
       if (authError || !user) {
+        console.error("No logged-in user:", authError);
         navigate("/login");
         return;
       }
 
+      // Get previously saved interests
       const { data, error } = await supabase
         .from("students")
         .select("interests")
@@ -143,31 +151,42 @@ function StudentProfile() {
         .single();
 
       if (error) {
-        console.error("Could not load interests:", error);
+        console.error("Interest loading error:", error);
+        setSelectedInterests([]);
         return;
       }
 
-      if (Array.isArray(data?.interests)) {
-        setSelectedInterests(data.interests);
-      }
+      setSelectedInterests(
+        Array.isArray(data?.interests) ? data.interests : []
+      );
     } catch (error) {
-      console.error("Interest loading error:", error);
+      console.error("Profile loading error:", error);
+      setSelectedInterests([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const toggleInterest = (skill) => {
-    setSelectedInterests((current) => {
-      if (current.includes(skill)) {
-        return current.filter((item) => item !== skill);
+  // =========================================
+  // TOGGLE SKILL
+  // =========================================
+
+  const toggleInterest = (interest) => {
+    setSelectedInterests((prev) => {
+      if (prev.includes(interest)) {
+        return prev.filter((item) => item !== interest);
       }
-      return [...current, skill];
+
+      return [...prev, interest];
     });
   };
 
-  const handleContinue = async (event) => {
-    event.preventDefault();
+  // =========================================
+  // SAVE INTERESTS + CONTINUE
+  // =========================================
+
+  const handleContinue = async (e) => {
+    e.preventDefault();
 
     if (selectedInterests.length === 0) {
       alert("Please select at least one area of interest.");
@@ -179,11 +198,11 @@ function StudentProfile() {
 
       const {
         data: { user },
-        error: authError,
+        error: userError,
       } = await supabase.auth.getUser();
 
-      if (authError || !user) {
-        alert("Your session has expired. Please login again.");
+      if (userError || !user) {
+        alert("Please login again.");
         navigate("/login");
         return;
       }
@@ -201,139 +220,320 @@ function StudentProfile() {
         return;
       }
 
+      console.log("INTERESTS SAVED SUCCESSFULLY");
+
       navigate("/career-selection");
     } catch (error) {
-      console.error("PROFILE ERROR:", error);
+      console.error("PROFILE SAVE ERROR:", error);
       alert("Something went wrong while saving your interests.");
     } finally {
       setSaving(false);
     }
   };
 
+  // =========================================
+  // LOADING SCREEN
+  // =========================================
+
   if (loading) {
     return (
-      <div className="student-interest-page">
-        <div className="student-interest-loading">
-          <Sparkles size={22} />
-          <p>Preparing your interest profile...</p>
+      <div className="profile-page">
+        <div className="profile-loading">
+          <Sparkles size={28} />
+
+          <p>Loading your interests...</p>
         </div>
       </div>
     );
   }
 
+  // =========================================
+  // PAGE
+  // =========================================
+
   return (
-    <div className="student-interest-page">
-      <div className="student-interest-container">
-        {/* HEADER */}
-        <header className="student-interest-header">
-          <Link to="/" className="auth-brand">
-            <div className="brand-mark">
-              <Sparkles size={18} />
-            </div>
-            <div>
-              <span className="brand-name">CAREERPATH</span>
-              <span className="brand-subtitle">AI</span>
-            </div>
-          </Link>
+    <div className="profile-page">
 
-          <div className="interest-progress">
-            PROFILE SETUP <span>01 / 03</span>
-          </div>
-        </header>
+      {/* =====================================
+          HEADER
+      ====================================== */}
 
-        {/* INTRO */}
-        <section className="student-interest-intro">
-          <div className="student-interest-kicker">
-            <span />
-            YOUR INTERESTS
+      <header className="profile-header">
+
+        <Link to="/" className="auth-brand">
+
+          <div className="brand-mark">
+            <Sparkles size={18} />
           </div>
 
-          <h1>
-            What do you want
-            <br />
-            to <span>explore?</span>
-          </h1>
+          <div>
+            <span className="brand-name">
+              CAREERPATH
+            </span>
 
-          <p>
-            Select the technologies and skills that interest you.
-            We'll use them to understand which career paths may suit you.
-          </p>
-
-          <div className="selection-counter">
-            <strong>{selectedInterests.length}</strong>
-            <span>
-              {selectedInterests.length === 1 ? "skill" : "skills"} selected
+            <span className="brand-subtitle">
+              AI
             </span>
           </div>
-        </section>
 
-        {/* INTEREST CATEGORIES */}
-        <form onSubmit={handleContinue}>
-          <div className="interest-category-grid">
-            {interestCategories.map((category) => {
-              const Icon = category.icon;
+        </Link>
 
-              return (
-                <section
-                  className="interest-category-card"
-                  key={category.id}
-                >
-                  <div className="interest-category-header">
-                    <div className="interest-category-icon">
-                      <Icon size={20} />
-                    </div>
+        <div className="profile-progress-text">
+          PROFILE SETUP <span>02 / 03</span>
+        </div>
 
-                    <div>
-                      <h2>{category.title}</h2>
-                      <p>{category.description}</p>
-                    </div>
-                  </div>
+      </header>
 
-                  <div className="interest-skill-grid">
-                    {category.skills.map((skill) => {
-                      const selected = selectedInterests.includes(skill);
+      {/* =====================================
+          MAIN
+      ====================================== */}
 
-                      return (
-                        <button
-                          type="button"
-                          key={skill}
-                          className={`interest-skill ${
-                            selected ? "selected" : ""
-                          }`}
-                          onClick={() => toggleInterest(skill)}
-                        >
-                          <span>{skill}</span>
+      <main className="profile-main">
 
-                          <span className="interest-check">
-                            {selected && <Check size={13} />}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </section>
-              );
-            })}
+        {/* ===================================
+            SIDEBAR
+        ==================================== */}
+
+        <aside className="profile-sidebar">
+
+          <div className="sidebar-title">
+
+            <span className="sidebar-kicker">
+              YOUR JOURNEY
+            </span>
+
+            <h2>
+              Discover what
+              <br />
+              <span>drives you.</span>
+            </h2>
+
+            <p>
+              Tell us about the areas you're interested
+              in. Choose as many skills as you'd like —
+              we'll use them to understand your career
+              direction.
+            </p>
+
           </div>
 
-          {/* BOTTOM ACTION */}
-          <div className="student-interest-footer">
-            <div>
-              <span className="footer-label">NEXT</span>
-              <strong>Find careers that match your interests</strong>
+          {/* JOURNEY STEPS */}
+
+          <div className="setup-steps">
+
+            {/* STEP 01 */}
+
+            <div className="setup-step">
+
+              <div className="step-icon">
+                <UserRound size={17} />
+              </div>
+
+              <div>
+                <small>STEP 01</small>
+                <strong>About You</strong>
+              </div>
+
             </div>
 
-            <button
-              type="submit"
-              className="student-interest-button"
-              disabled={saving || selectedInterests.length === 0}
-            >
-              {saving ? "Saving..." : "Continue"}
-              {!saving && <ArrowRight size={17} />}
-            </button>
+            <div className="setup-line" />
+
+            {/* STEP 02 */}
+
+            <div className="setup-step active">
+
+              <div className="step-icon">
+                <Sparkles size={17} />
+              </div>
+
+              <div>
+                <small>STEP 02</small>
+                <strong>Interests</strong>
+              </div>
+
+            </div>
+
+            <div className="setup-line" />
+
+            {/* STEP 03 */}
+
+            <div className="setup-step">
+
+              <div className="step-icon">
+                <GraduationCap size={17} />
+              </div>
+
+              <div>
+                <small>STEP 03</small>
+                <strong>Career Goals</strong>
+              </div>
+
+            </div>
+
           </div>
-        </form>
-      </div>
+
+        </aside>
+
+        {/* ===================================
+            RIGHT CONTENT
+        ==================================== */}
+
+        <section className="profile-form-section">
+
+          {/* PAGE HEADING */}
+
+          <div className="form-heading">
+
+            <div className="profile-kicker">
+
+              <span />
+
+              YOUR INTERESTS
+
+            </div>
+
+            <h1>
+              What are you
+              <br />
+              <span>interested in?</span>
+            </h1>
+
+            <p>
+              Select the areas and skills that excite you.
+              You can choose multiple skills across
+              different categories.
+            </p>
+
+          </div>
+
+          {/* =================================
+              INTEREST FORM
+          ================================== */}
+
+          <form
+            className="profile-form"
+            onSubmit={handleContinue}
+          >
+
+            {/* =================================
+                CATEGORIES
+            ================================== */}
+
+            {interestCategories.map((category) => (
+
+              <section
+                className="profile-review-card"
+                key={category.title}
+              >
+
+                {/* CATEGORY HEADER */}
+
+                <div className="profile-review-header">
+
+                  <div>
+
+                    <span className="review-kicker">
+                      INTEREST AREA
+                    </span>
+
+                    <h2>
+                      {category.title}
+                    </h2>
+
+                    <p className="review-description">
+                      {category.description}
+                    </p>
+
+                  </div>
+
+                  <div className="review-header-icon">
+                    {category.icon}
+                  </div>
+
+                </div>
+
+                {/* SKILLS */}
+
+                <div className="interest-grid">
+
+                  {category.skills.map((skill) => {
+
+                    const selected =
+                      selectedInterests.includes(skill);
+
+                    return (
+
+                      <button
+                        key={skill}
+                        type="button"
+                        className={`interest-chip ${
+                          selected ? "selected" : ""
+                        }`}
+                        onClick={() =>
+                          toggleInterest(skill)
+                        }
+                      >
+
+                        <span>
+                          {skill}
+                        </span>
+
+                        {selected && (
+                          <Check size={15} />
+                        )}
+
+                      </button>
+
+                    );
+
+                  })}
+
+                </div>
+
+              </section>
+
+            ))}
+
+            {/* =================================
+                CONTINUE
+            ================================== */}
+
+            <div className="profile-selection-footer">
+
+              <div className="selected-count">
+
+                {selectedInterests.length}{" "}
+                {selectedInterests.length === 1
+                  ? "skill"
+                  : "skills"}{" "}
+                selected
+
+              </div>
+
+              <button
+                type="submit"
+                className="profile-continue"
+                disabled={saving}
+              >
+
+                {saving
+                  ? "Saving..."
+                  : "Continue to Career Selection"}
+
+                {!saving && (
+                  <ArrowRight size={17} />
+                )}
+
+              </button>
+
+            </div>
+
+          </form>
+
+        </section>
+
+      </main>
+
     </div>
   );
 }

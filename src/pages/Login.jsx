@@ -76,7 +76,7 @@ function Login() {
 
     alert("Login successful!");
 
-    navigate("/career-selection");
+    navigate("/student-profile");
 
   } catch (error) {
     console.error("LOGIN ERROR:", error);
