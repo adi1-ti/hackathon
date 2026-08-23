@@ -31,7 +31,6 @@ const interestCategories = [
       "Testing, Debugging & Version Control",
     ],
   },
-
   {
     id: "backend",
     title: "Backend Development",
@@ -47,7 +46,6 @@ const interestCategories = [
       "Testing, Debugging & Version Control",
     ],
   },
-
   {
     id: "data",
     title: "Data & Analytics",
@@ -66,7 +64,6 @@ const interestCategories = [
       "Mathematics, Statistics & Probability",
     ],
   },
-
   {
     id: "aiml",
     title: "AI / Machine Learning",
@@ -82,7 +79,6 @@ const interestCategories = [
       "Data Processing & Analysis",
     ],
   },
-
   {
     id: "cybersecurity",
     title: "Cybersecurity",
@@ -99,7 +95,6 @@ const interestCategories = [
       "Authentication, Authorization & Security",
     ],
   },
-
   {
     id: "uiux",
     title: "UI / UX Design",
@@ -167,7 +162,6 @@ function StudentProfile() {
       if (current.includes(skill)) {
         return current.filter((item) => item !== skill);
       }
-
       return [...current, skill];
     });
   };
@@ -207,8 +201,6 @@ function StudentProfile() {
         return;
       }
 
-      console.log("INTERESTS SAVED:", selectedInterests);
-
       navigate("/career-selection");
     } catch (error) {
       console.error("PROFILE ERROR:", error);
@@ -232,15 +224,12 @@ function StudentProfile() {
   return (
     <div className="student-interest-page">
       <div className="student-interest-container">
-
         {/* HEADER */}
-
         <header className="student-interest-header">
           <Link to="/" className="auth-brand">
             <div className="brand-mark">
               <Sparkles size={18} />
             </div>
-
             <div>
               <span className="brand-name">CAREERPATH</span>
               <span className="brand-subtitle">AI</span>
@@ -253,7 +242,6 @@ function StudentProfile() {
         </header>
 
         {/* INTRO */}
-
         <section className="student-interest-intro">
           <div className="student-interest-kicker">
             <span />
@@ -280,10 +268,8 @@ function StudentProfile() {
         </section>
 
         {/* INTEREST CATEGORIES */}
-
         <form onSubmit={handleContinue}>
           <div className="interest-category-grid">
-
             {interestCategories.map((category) => {
               const Icon = category.icon;
 
@@ -328,11 +314,9 @@ function StudentProfile() {
                 </section>
               );
             })}
-
           </div>
 
           {/* BOTTOM ACTION */}
-
           <div className="student-interest-footer">
             <div>
               <span className="footer-label">NEXT</span>
@@ -349,7 +333,6 @@ function StudentProfile() {
             </button>
           </div>
         </form>
-
       </div>
     </div>
   );

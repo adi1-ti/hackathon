@@ -3189,21 +3189,19 @@ button {
 
 
 
-
-
-/* =========================================
-   STUDENT PROFILE PAGE
-   OCEANIC / DEEP OCEAN TEAL THEME
-========================================= */
-
 .profile-page {
   min-height: 100vh;
 
   background:
     radial-gradient(
-      circle at 80% 15%,
-      rgba(79, 143, 143, 0.10),
-      transparent 30%
+      circle at 82% 12%,
+      rgba(79, 143, 143, 0.12),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 10% 80%,
+      rgba(29, 94, 94, 0.06),
+      transparent 28%
     ),
     #daf0f0;
 
@@ -3217,6 +3215,7 @@ button {
 .profile-header {
   width: min(1380px, calc(100% - 34px));
   min-height: 70px;
+
   margin: 12px auto 0;
   padding: 0 22px;
 
@@ -3233,6 +3232,9 @@ button {
 
   box-shadow:
     0 8px 30px rgba(10, 47, 47, 0.04);
+
+  position: relative;
+  z-index: 5;
 }
 
 .profile-progress-text {
@@ -3259,11 +3261,14 @@ button {
   margin: 0 auto;
 
   display: grid;
-  grid-template-columns: 0.7fr 1.3fr;
 
-  gap: 90px;
+  grid-template-columns: 0.72fr 1.28fr;
+
+  gap: 85px;
 
   align-items: center;
+
+  padding: 35px 0 60px;
 }
 
 /* =========================================
@@ -3272,12 +3277,12 @@ button {
 
 .profile-sidebar {
   position: relative;
-  padding: 45px 0;
+  padding: 20px 0;
 }
 
 .sidebar-title {
   max-width: 390px;
-  margin-top: -480px;
+  margin-top: -420px;
 }
 
 .sidebar-kicker {
@@ -3294,8 +3299,11 @@ button {
   font-family: "Playfair Display", Georgia, serif;
 
   font-size: clamp(40px, 4vw, 57px);
+
   line-height: 1;
+
   font-weight: 600;
+
   letter-spacing: -1.5px;
 
   color: #0a2f2f;
@@ -3307,45 +3315,58 @@ button {
 
 .sidebar-title p {
   max-width: 350px;
+
   margin-top: 20px;
 
   color: #4f7777;
 
   font-size: 13px;
+
   line-height: 1.8;
 }
 
 /* =========================================
-   SETUP STEPS
+   JOURNEY STEPS
 ========================================= */
 
 .setup-steps {
   margin-top: 55px;
+
   width: min(320px, 100%);
 }
 
 .setup-step {
   display: flex;
   align-items: center;
+
   gap: 14px;
 }
 
 .step-icon {
   width: 42px;
   height: 42px;
+
   flex: 0 0 42px;
 
   display: grid;
   place-items: center;
 
   border: 1px solid rgba(10, 47, 47, 0.14);
+
   border-radius: 11px;
 
   color: #6b9292;
 
   background: rgba(229, 242, 242, 0.65);
 
-  transition: 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+.setup-step:hover .step-icon {
+  transform: translateY(-2px);
 }
 
 .setup-step.active .step-icon {
@@ -3365,6 +3386,7 @@ button {
   color: #8aa7a7;
 
   font-size: 7px;
+
   letter-spacing: 2px;
 }
 
@@ -3374,6 +3396,7 @@ button {
 
 .setup-step strong {
   display: block;
+
   margin-top: 4px;
 
   color: #648585;
@@ -3381,6 +3404,7 @@ button {
   font-family: "Playfair Display", Georgia, serif;
 
   font-size: 17px;
+
   font-weight: 500;
 }
 
@@ -3403,27 +3427,35 @@ button {
 }
 
 /* =========================================
-   FORM SECTION
+   CONTENT SECTION
 ========================================= */
 
 .profile-form-section {
   width: 100%;
-  padding: 55px 0;
+  padding: 25px 0;
 }
 
+/* =========================================
+   PAGE HEADING
+========================================= */
+
 .form-heading {
-  margin-bottom: 34px;
+  margin-bottom: 30px;
 }
 
 .profile-kicker {
   display: flex;
+
   align-items: center;
+
   gap: 9px;
 
   color: #1d5e5e;
 
   font-size: 9px;
+
   letter-spacing: 3px;
+
   font-weight: 700;
 }
 
@@ -3440,8 +3472,11 @@ button {
   font-family: "Playfair Display", Georgia, serif;
 
   font-size: clamp(42px, 4vw, 58px);
+
   line-height: 1;
+
   font-weight: 600;
+
   letter-spacing: -1.5px;
 
   color: #0a2f2f;
@@ -3452,222 +3487,383 @@ button {
 }
 
 .form-heading p {
-  max-width: 540px;
+  max-width: 600px;
+
   margin-top: 15px;
 
   color: #4f7777;
 
   font-size: 13px;
-  line-height: 1.7;
+
+  line-height: 1.75;
 }
 
 /* =========================================
-   FORM
+   PROFILE CARD
 ========================================= */
 
-.profile-form {
+.profile-review-card {
   width: 100%;
-  padding: 30px;
+
+  padding: 24px;
+
+  margin-bottom: 18px;
 
   border: 1px solid rgba(10, 47, 47, 0.14);
+
   border-radius: 17px;
 
   background:
     radial-gradient(
       circle at 100% 0%,
       rgba(29, 94, 94, 0.07),
-      transparent 30%
+      transparent 32%
     ),
     rgba(229, 242, 242, 0.82);
 
   backdrop-filter: blur(12px);
 
   box-shadow:
-    0 20px 70px rgba(10, 47, 47, 0.08),
+    0 20px 70px rgba(10, 47, 47, 0.07),
     inset 0 0 40px rgba(29, 94, 94, 0.018);
+
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.profile-review-card:hover {
+  transform: translateY(-2px);
+
+  border-color: rgba(29, 94, 94, 0.20);
+
+  box-shadow:
+    0 25px 75px rgba(10, 47, 47, 0.09);
 }
 
 /* =========================================
-   INPUTS
+   CARD HEADER
 ========================================= */
 
-.profile-input-group {
-  margin-bottom: 19px;
+.profile-review-header {
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 22px;
 }
 
-.profile-input-group label,
-.interest-heading label {
+.review-kicker {
   display: block;
-  margin-bottom: 8px;
 
-  color: #315f5f;
+  color: #1d5e5e;
+
+  font-size: 8px;
+
+  letter-spacing: 2.5px;
+
+  font-weight: 700;
+}
+
+.profile-review-header h2 {
+  margin-top: 7px;
+
+  color: #0a2f2f;
+
+  font-family: "Playfair Display", Georgia, serif;
+
+  font-size: 23px;
+
+  line-height: 1.2;
+
+  font-weight: 600;
+}
+
+.review-description {
+  margin-top: 6px;
+
+  color: #6b9292;
 
   font-size: 10px;
-  font-weight: 500;
+
+  line-height: 1.6;
 }
 
-.profile-input {
-  min-height: 50px;
+.review-header-icon {
+  width: 42px;
+  height: 42px;
+
+  flex: 0 0 42px;
+
+  display: grid;
+
+  place-items: center;
+
+  color: #1d5e5e;
+
+  border: 1px solid rgba(29, 94, 94, 0.20);
+
+  border-radius: 11px;
+
+  background: rgba(29, 94, 94, 0.06);
+}
+
+/* =========================================
+   PROFILE INFORMATION GRID
+========================================= */
+
+.profile-info-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 12px;
+}
+
+.profile-info-item {
+  min-height: 78px;
 
   display: flex;
+
   align-items: center;
-  gap: 11px;
 
-  padding: 0 14px;
+  gap: 13px;
 
-  border: 1px solid rgba(10, 47, 47, 0.15);
-  border-radius: 9px;
+  padding: 13px 14px;
 
-  background: rgba(229, 242, 242, 0.75);
+  border: 1px solid rgba(10, 47, 47, 0.11);
 
-  transition: 0.25s ease;
+  border-radius: 11px;
+
+  background: rgba(229, 242, 242, 0.56);
+
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease,
+    transform 0.25s ease;
 }
 
-.profile-input:hover {
-  border-color: rgba(29, 94, 94, 0.28);
+.profile-info-item:hover {
+  transform: translateY(-1px);
+
+  border-color: rgba(29, 94, 94, 0.22);
+
+  background: rgba(245, 251, 251, 0.82);
 }
 
-.profile-input:focus-within {
-  border-color: rgba(29, 94, 94, 0.55);
-
-  background: #f5fbfb;
-
-  box-shadow:
-    0 0 0 3px rgba(183, 214, 214, 0.42),
-    0 8px 25px rgba(10, 47, 47, 0.04);
+.profile-info-item-full {
+  grid-column: 1 / -1;
 }
 
-.profile-input > svg {
-  flex-shrink: 0;
-  color: #6b9292;
-}
+.profile-info-icon {
+  width: 38px;
+  height: 38px;
 
-.profile-input:focus-within > svg {
+  flex: 0 0 38px;
+
+  display: grid;
+
+  place-items: center;
+
   color: #1d5e5e;
+
+  border: 1px solid rgba(29, 94, 94, 0.15);
+
+  border-radius: 10px;
+
+  background: rgba(29, 94, 94, 0.055);
 }
 
-.profile-input input,
-.profile-input select {
+.profile-info-content {
+  min-width: 0;
+
+  flex: 1;
+}
+
+.profile-info-content label {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #7c9b9b;
+
+  font-size: 8px;
+
+  letter-spacing: 1px;
+
+  text-transform: uppercase;
+}
+
+.profile-info-content input,
+.profile-info-content select {
   width: 100%;
 
+  padding: 0;
+
   border: none;
+
   outline: none;
 
   color: #0a2f2f;
+
   background: transparent;
 
   font-family: "DM Sans", sans-serif;
+
   font-size: 12px;
+
+  font-weight: 600;
 }
 
-.profile-input input::placeholder {
+.profile-info-content input::placeholder {
   color: #8aa7a7;
+
+  opacity: 1;
 }
 
-.profile-input select {
-  appearance: none;
+.profile-info-content select {
   cursor: pointer;
+
+  appearance: none;
+
+  color: #0a2f2f;
 }
 
-.profile-input select option {
+.profile-info-content select option {
   color: #0a2f2f;
+
   background: #e5f2f2;
+}
+
+.profile-info-content input:focus,
+.profile-info-content select:focus {
+  color: #1d5e5e;
 }
 
 /* =========================================
    INTERESTS
 ========================================= */
 
-.interest-section {
-  margin-top: 28px;
+.interests-card {
+  margin-top: 18px;
 }
 
-.interest-heading {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
+.selected-count {
+  flex-shrink: 0;
 
-  gap: 20px;
-  margin-bottom: 13px;
-}
+  padding: 7px 11px;
 
-.interest-heading label {
-  margin-bottom: 0;
-}
+  border: 1px solid rgba(29, 94, 94, 0.18);
 
-.interest-heading p {
-  margin-top: 5px;
+  border-radius: 20px;
 
-  color: #6b9292;
-
-  font-size: 9px;
-}
-
-.interest-heading > span {
   color: #1d5e5e;
 
+  background: rgba(29, 94, 94, 0.06);
+
   font-size: 8px;
-  letter-spacing: 1px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.8px;
+
+  white-space: nowrap;
 }
 
 /* =========================================
-   INTEREST CHIPS
+   INTEREST GRID
 ========================================= */
 
 .interest-grid {
   display: grid;
 
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 
   gap: 9px;
 }
 
 .interest-chip {
-  min-height: 45px;
+  min-height: 48px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
 
   gap: 8px;
-  padding: 10px 12px;
+
+  padding: 10px 13px;
 
   border: 1px solid rgba(10, 47, 47, 0.13);
-  border-radius: 9px;
+
+  border-radius: 10px;
 
   color: #4f7777;
 
   background: rgba(229, 242, 242, 0.65);
 
+  font-family: "DM Sans", sans-serif;
+
   font-size: 9px;
+
+  font-weight: 500;
+
   text-align: left;
 
   cursor: pointer;
 
-  transition: 0.25s ease;
+  transition:
+    transform 0.22s ease,
+    border-color 0.22s ease,
+    color 0.22s ease,
+    background 0.22s ease,
+    box-shadow 0.22s ease;
 }
 
 .interest-chip:hover {
+  transform: translateY(-2px);
+
   border-color: rgba(29, 94, 94, 0.35);
 
   color: #0a2f2f;
 
-  background: rgba(245, 251, 251, 0.9);
+  background: rgba(245, 251, 251, 0.92);
+
+  box-shadow:
+    0 8px 20px rgba(10, 47, 47, 0.05);
 }
 
 .interest-chip.selected {
-  border-color: rgba(29, 94, 94, 0.55);
+  border-color: rgba(29, 94, 94, 0.58);
 
   color: #1d5e5e;
 
-  background: rgba(29, 94, 94, 0.07);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(79, 143, 143, 0.14),
+      rgba(29, 94, 94, 0.065)
+    );
 
   box-shadow:
-    inset 0 0 18px rgba(29, 94, 94, 0.025);
+    inset 0 0 18px rgba(29, 94, 94, 0.025),
+    0 6px 18px rgba(29, 94, 94, 0.07);
+}
+
+.interest-chip.selected span {
+  font-weight: 700;
 }
 
 .interest-chip svg {
   flex-shrink: 0;
+
+  color: #1d5e5e;
 }
 
 /* =========================================
@@ -3676,18 +3872,22 @@ button {
 
 .profile-continue {
   width: 100%;
-  min-height: 51px;
 
-  margin-top: 28px;
+  min-height: 52px;
+
+  margin-top: 8px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
   gap: 10px;
 
   border: 1px solid #1d5e5e;
-  border-radius: 9px;
+
+  border-radius: 10px;
 
   color: #e5f2f2;
 
@@ -3698,20 +3898,26 @@ button {
       #1d5e5e
     );
 
+  font-family: "DM Sans", sans-serif;
+
   font-size: 11px;
+
   font-weight: 700;
+
   letter-spacing: 0.6px;
 
   cursor: pointer;
 
-  transition: 0.25s ease;
-
-  box-shadow:
-    0 8px 22px rgba(29, 94, 94, 0.18);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    filter 0.25s ease;
 }
 
 .profile-continue:hover {
   transform: translateY(-2px);
+
+  filter: brightness(1.03);
 
   box-shadow:
     0 12px 35px rgba(29, 94, 94, 0.26);
@@ -3721,171 +3927,101 @@ button {
   transform: translateY(0);
 }
 
-/* =========================================
-   FORM HEADING + AVATAR
-========================================= */
-
-.form-heading-layout {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  gap: 45px;
-
-  width: 100%;
-  margin-bottom: 35px;
+.profile-continue svg {
+  transition: transform 0.25s ease;
 }
 
-.form-heading-layout .form-heading {
-  text-align: left;
-  margin: 0;
-}
-
-.form-heading-layout .profile-kicker {
-  justify-content: flex-start;
-}
-
-/* =========================================
-   PROFILE AVATAR
-========================================= */
-
-.profile-avatar {
-  width: 120px;
-  height: 120px;
-
-  flex-shrink: 0;
-
-  animation:
-    avatarFloat 3s ease-in-out infinite;
-}
-
-.profile-avatar svg {
-  width: 100%;
-  height: 100%;
-}
-
-.avatar-glow {
-  fill: rgba(183, 214, 214, 0.20);
-}
-
-.avatar-head {
-  fill: #b7d6d6;
-}
-
-.avatar-body {
-  fill: #1d5e5e;
-}
-
-.avatar-eye {
-  fill: #0a2f2f;
-
-  animation:
-    blink 4s infinite;
-
-  transform-origin: center;
-}
-
-.avatar-smile {
-  stroke: #0a2f2f;
-  stroke-width: 2;
-  stroke-linecap: round;
-}
-
-.avatar-spark {
-  fill: #4f8f8f;
-
-  animation:
-    sparkle 2s ease-in-out infinite;
-}
-
-/* =========================================
-   AVATAR ANIMATIONS
-========================================= */
-
-@keyframes avatarFloat {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-7px);
-  }
-}
-
-@keyframes blink {
-  0%,
-  92%,
-  100% {
-    transform: scaleY(1);
-  }
-
-  95% {
-    transform: scaleY(0.15);
-  }
-}
-
-@keyframes sparkle {
-  0%,
-  100% {
-    opacity: 0.35;
-    transform: scale(0.85);
-  }
-
-  50% {
-    opacity: 1;
-    transform: scale(1.1);
-  }
+.profile-continue:hover svg {
+  transform: translateX(4px);
 }
 
 /* =========================================
    TABLET
 ========================================= */
 
-@media (max-width: 1050px) {
+@media (max-width: 1100px) {
   .profile-main {
     grid-template-columns: 1fr;
 
-    gap: 25px;
+    gap: 35px;
 
-    padding: 50px 0 80px;
+    align-items: start;
+
+    padding: 50px 0 75px;
   }
 
   .profile-sidebar {
-    padding-bottom: 0;
+    padding: 0;
   }
 
   .sidebar-title {
-    max-width: 600px;
+    max-width: 620px;
+
     margin-top: 0;
+  }
+
+  .sidebar-title h2 {
+    font-size: 48px;
+  }
+
+  .sidebar-title p {
+    max-width: 570px;
   }
 
   .setup-steps {
     display: flex;
+
     align-items: center;
 
     gap: 12px;
 
     width: 100%;
-    margin-top: 30px;
-  }
 
-  .setup-line {
-    width: 35px;
-    height: 1px;
-    margin-left: 0;
+    margin-top: 30px;
   }
 
   .setup-step {
     flex: 1;
   }
 
-  .setup-step strong {
-    font-size: 14px;
+  .setup-line {
+    width: 35px;
+    height: 1px;
+
+    margin-left: 0;
+
+    background:
+      linear-gradient(
+        to right,
+        rgba(29, 94, 94, 0.25),
+        rgba(29, 94, 94, 0.04)
+      );
   }
 
-  .setup-step small {
-    font-size: 6px;
+  .profile-form-section {
+    padding: 0;
+  }
+}
+
+/* =========================================
+   SMALL TABLET
+========================================= */
+
+@media (max-width: 850px) {
+  .profile-main {
+    width: calc(100% - 40px);
+  }
+
+  .profile-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-info-item-full {
+    grid-column: auto;
+  }
+
+  .interest-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -3896,7 +4032,12 @@ button {
 @media (max-width: 700px) {
   .profile-header {
     width: calc(100% - 20px);
+
+    min-height: 64px;
+
     padding: 0 15px;
+
+    border-radius: 12px;
   }
 
   .profile-progress-text {
@@ -3905,16 +4046,26 @@ button {
 
   .profile-main {
     width: calc(100% - 24px);
-    padding-top: 35px;
+
+    padding-top: 30px;
+
+    padding-bottom: 50px;
   }
 
   .sidebar-title h2 {
     font-size: 40px;
   }
 
+  .sidebar-title p {
+    font-size: 12px;
+  }
+
   .setup-steps {
     flex-direction: column;
+
     align-items: flex-start;
+
+    gap: 0;
   }
 
   .setup-step {
@@ -3924,39 +4075,66 @@ button {
   .setup-line {
     width: 1px;
     height: 25px;
+
     margin-left: 20px;
+
+    background:
+      linear-gradient(
+        to bottom,
+        rgba(29, 94, 94, 0.25),
+        rgba(29, 94, 94, 0.04)
+      );
   }
 
-  .profile-form {
-    padding: 20px;
-  }
-
-  .form-heading-layout {
-    flex-direction: column;
-
-    gap: 20px;
-
-    align-items: flex-start;
-  }
-
-  .form-heading-layout .form-heading {
-    width: 100%;
-  }
-
-  .profile-avatar {
-    width: 95px;
-    height: 95px;
-
-    align-self: center;
-    order: -1;
+  .form-heading {
+    margin-bottom: 25px;
   }
 
   .form-heading h1 {
     font-size: 40px;
   }
 
+  .form-heading p {
+    font-size: 12px;
+  }
+
+  .profile-form {
+    width: 100%;
+  }
+
+  .profile-review-card {
+    padding: 19px;
+
+    border-radius: 14px;
+  }
+
+  .profile-review-header {
+    gap: 12px;
+  }
+
+  .profile-review-header h2 {
+    font-size: 21px;
+  }
+
+  .review-header-icon {
+    width: 38px;
+    height: 38px;
+
+    flex-basis: 38px;
+  }
+
+  .selected-count {
+    padding: 6px 8px;
+  }
+
   .interest-grid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .interest-chip {
+    min-height: 47px;
+
+    font-size: 8.5px;
   }
 }
 
@@ -3966,28 +4144,89 @@ button {
 
 @media (max-width: 480px) {
   .profile-header {
-    min-height: 62px;
+    min-height: 60px;
   }
 
   .profile-progress-text {
     display: none;
   }
 
-  .profile-form {
-    padding: 17px;
+  .profile-main {
+    width: calc(100% - 20px);
+
+    padding-top: 25px;
+  }
+
+  .sidebar-title h2 {
+    font-size: 36px;
+  }
+
+  .sidebar-title p {
+    font-size: 11.5px;
+
+    line-height: 1.7;
+  }
+
+  .form-heading h1 {
+    font-size: 35px;
+  }
+
+  .profile-review-card {
+    padding: 16px;
+  }
+
+  .profile-review-header {
+    align-items: flex-start;
+  }
+
+  .profile-review-header h2 {
+    font-size: 19px;
+  }
+
+  .profile-info-item {
+    min-height: 70px;
+
+    padding: 11px;
+  }
+
+  .profile-info-icon {
+    width: 35px;
+    height: 35px;
+
+    flex-basis: 35px;
+  }
+
+  .profile-info-content input,
+  .profile-info-content select {
+    font-size: 11px;
   }
 
   .interest-grid {
     grid-template-columns: 1fr;
   }
 
-  .form-heading h1 {
-    font-size: 36px;
+  .interest-chip {
+    min-height: 45px;
+
+    font-size: 9px;
   }
 
-  .profile-avatar {
-    width: 85px;
-    height: 85px;
+  .profile-continue {
+    min-height: 50px;
+  }
+}
+
+/* =========================================
+   REDUCED MOTION
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-review-card,
+  .profile-info-item,
+  .interest-chip,
+  .profile-continue,
+  .step-icon {
+    transition: none;
   }
 }
 
