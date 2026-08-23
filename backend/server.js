@@ -199,10 +199,8 @@ app.get("/api/assessments/:career", async (req, res) => {
 // START SERVER
 // ==========================================
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(
-    `Backend running on http://localhost:${PORT}`
-  );
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Backend running on port ${PORT}`);
 });
