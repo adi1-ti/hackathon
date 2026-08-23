@@ -4080,12 +4080,12 @@ button {
   background:
     radial-gradient(
       circle at 15% 10%,
-      rgba(183, 214, 214, 0.42),
+      rgba(120, 185, 185, 0.42),
       transparent 30%
     ),
     radial-gradient(
       circle at 85% 80%,
-      rgba(79, 143, 143, 0.16),
+      rgba(71, 142, 142, 0.334),
       transparent 32%
     ),
     #e5f2f2;
