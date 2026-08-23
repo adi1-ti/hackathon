@@ -95,7 +95,7 @@ function Home() {
               Login
             </Link>
 
-            <Link to="/login" className="nav-cta">
+            <Link to="/register" className="nav-cta">
               Get Started
               <ArrowRight size={15} />
             </Link>
@@ -245,37 +245,6 @@ function Home() {
               </div>
             </div>
 
-          </div>
-
-        </section>
-
-        {/* STATS */}
-        <section className="stats-strip">
-
-          <div className="stat">
-            <strong>50+</strong>
-            <span>Career Paths</span>
-          </div>
-
-          <div className="stat-divider" />
-
-          <div className="stat">
-            <strong>100+</strong>
-            <span>Skills Mapped</span>
-          </div>
-
-          <div className="stat-divider" />
-
-          <div className="stat">
-            <strong>AI</strong>
-            <span>Personalized Analysis</span>
-          </div>
-
-          <div className="stat-divider" />
-
-          <div className="stat">
-            <strong>1</strong>
-            <span>Path Built For You</span>
           </div>
 
         </section>
@@ -556,7 +525,7 @@ function Home() {
             Start building a career path that actually makes sense for you.
           </p>
 
-          <Link to="/login" className="gold-button">
+          <Link to="/Register" className="gold-button">
             Start Your Journey
             <ArrowRight size={17} />
           </Link>
