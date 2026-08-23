@@ -1,0 +1,849 @@
+
+/* =========================================
+   STUDENT PROFILE
+   COMPACT OCEANIC / DEEP OCEAN TEAL UI
+========================================= */
+
+.profile-page {
+  min-height: 100vh;
+
+  background:
+    radial-gradient(
+      circle at 85% 10%,
+      rgba(79, 143, 143, 0.12),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 10% 85%,
+      rgba(29, 94, 94, 0.06),
+      transparent 28%
+    ),
+    #daf0f0;
+
+  color: #0a2f2f;
+  padding-bottom: 35px;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.profile-header {
+  width: min(1380px, calc(100% - 40px));
+  min-height: 62px;
+
+  margin: 12px auto 0;
+  padding: 0 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border: 1px solid rgba(10, 47, 47, 0.13);
+  border-radius: 13px;
+
+  background: rgba(229, 242, 242, 0.78);
+
+  backdrop-filter: blur(14px);
+
+  box-shadow:
+    0 6px 25px rgba(10, 47, 47, 0.035);
+}
+
+/* =========================================
+   PROGRESS
+========================================= */
+
+.profile-progress-text {
+  color: #648585;
+
+  font-size: 8px;
+  letter-spacing: 2px;
+  font-weight: 700;
+}
+
+.profile-progress-text span {
+  margin-left: 7px;
+  color: #1d5e5e;
+}
+
+/* =========================================
+   MAIN
+========================================= */
+
+.profile-main {
+  width: min(1240px, calc(100% - 40px));
+
+  margin: 0 auto;
+
+  padding: 28px 0 30px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 28px;
+}
+
+/* =========================================
+   JOURNEY AREA
+========================================= */
+
+.profile-sidebar {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns: 0.8fr 1.2fr;
+
+  align-items: center;
+
+  gap: 45px;
+}
+
+/* =========================================
+   JOURNEY INTRO
+========================================= */
+
+.sidebar-title {
+  max-width: 430px;
+}
+
+.sidebar-kicker {
+  color: #1d5e5e;
+
+  font-size: 8px;
+
+  letter-spacing: 3px;
+
+  font-weight: 700;
+}
+
+.sidebar-title h2 {
+  margin-top: 12px;
+
+  font-family: "Playfair Display", Georgia, serif;
+
+  font-size: clamp(32px, 3.5vw, 48px);
+
+  line-height: 0.98;
+
+  font-weight: 600;
+
+  letter-spacing: -1.3px;
+
+  color: #0a2f2f;
+}
+
+.sidebar-title h2 span {
+  color: #1d5e5e;
+}
+
+.sidebar-title p {
+  max-width: 400px;
+
+  margin-top: 12px;
+
+  color: #4f7777;
+
+  font-size: 11px;
+
+  line-height: 1.7;
+}
+
+/* =========================================
+   JOURNEY STEPS
+========================================= */
+
+.setup-steps {
+  width: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding: 16px 18px;
+
+  border: 1px solid rgba(10, 47, 47, 0.11);
+
+  border-radius: 14px;
+
+  background: rgba(229, 242, 242, 0.62);
+
+  backdrop-filter: blur(10px);
+}
+
+.setup-step {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  flex: 1;
+}
+
+.step-icon {
+  width: 34px;
+  height: 34px;
+
+  flex: 0 0 34px;
+
+  display: grid;
+
+  place-items: center;
+
+  border: 1px solid rgba(10, 47, 47, 0.13);
+
+  border-radius: 9px;
+
+  color: #6b9292;
+
+  background: rgba(229, 242, 242, 0.75);
+
+  transition: 0.2s ease;
+}
+
+.setup-step.active .step-icon {
+  color: #1d5e5e;
+
+  border-color: rgba(29, 94, 94, 0.4);
+
+  background: rgba(29, 94, 94, 0.08);
+
+  box-shadow:
+    0 0 15px rgba(29, 94, 94, 0.07);
+}
+
+.setup-step small {
+  display: block;
+
+  color: #8aa7a7;
+
+  font-size: 6px;
+
+  letter-spacing: 1.5px;
+}
+
+.setup-step.active small {
+  color: #1d5e5e;
+}
+
+.setup-step strong {
+  display: block;
+
+  margin-top: 2px;
+
+  color: #648585;
+
+  font-family: "Playfair Display", Georgia, serif;
+
+  font-size: 14px;
+
+  font-weight: 500;
+}
+
+.setup-step.active strong {
+  color: #0a2f2f;
+}
+
+/* STEP CONNECTOR */
+
+.setup-line {
+  flex: 0 0 30px;
+
+  width: 30px;
+  height: 1px;
+
+  background:
+    linear-gradient(
+      to right,
+      rgba(29, 94, 94, 0.18),
+      rgba(29, 94, 94, 0.04)
+    );
+}
+
+/* =========================================
+   RIGHT CONTENT
+========================================= */
+
+.profile-form-section {
+  width: 100%;
+}
+
+/* =========================================
+   PAGE HEADING
+========================================= */
+
+.form-heading {
+  text-align: center;
+
+  margin: 0 auto 22px;
+
+  max-width: 720px;
+}
+
+.profile-kicker {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  color: #1d5e5e;
+
+  font-size: 8px;
+
+  letter-spacing: 3px;
+
+  font-weight: 700;
+}
+
+.profile-kicker span {
+  width: 22px;
+  height: 1px;
+
+  background: #1d5e5e;
+}
+
+.form-heading h1 {
+  margin-top: 11px;
+
+  font-family: "Playfair Display", Georgia, serif;
+
+  font-size: clamp(35px, 4vw, 50px);
+
+  line-height: 0.98;
+
+  font-weight: 600;
+
+  letter-spacing: -1.4px;
+
+  color: #0a2f2f;
+}
+
+.form-heading h1 span {
+  color: #1d5e5e;
+}
+
+.form-heading p {
+  max-width: 620px;
+
+  margin: 11px auto 0;
+
+  color: #4f7777;
+
+  font-size: 11px;
+
+  line-height: 1.65;
+}
+
+/* =========================================
+   FORM
+========================================= */
+
+.profile-form {
+  width: 100%;
+}
+
+/* =========================================
+   CATEGORY GRID
+========================================= */
+
+.profile-form-section .profile-form {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 13px;
+}
+
+/* =========================================
+   CATEGORY CARD
+========================================= */
+
+.profile-review-card {
+  width: 100%;
+
+  padding: 17px;
+
+  margin: 0;
+
+  border: 1px solid rgba(10, 47, 47, 0.12);
+
+  border-radius: 14px;
+
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(29, 94, 94, 0.055),
+      transparent 35%
+    ),
+    rgba(229, 242, 242, 0.75);
+
+  backdrop-filter: blur(10px);
+
+  box-shadow:
+    0 10px 30px rgba(10, 47, 47, 0.035);
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.profile-review-card:hover {
+  transform: translateY(-2px);
+
+  border-color: rgba(29, 94, 94, 0.18);
+
+  box-shadow:
+    0 15px 40px rgba(10, 47, 47, 0.055);
+}
+
+/* =========================================
+   CARD HEADER
+========================================= */
+
+.profile-review-header {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: flex-start;
+
+  gap: 10px;
+
+  margin-bottom: 13px;
+}
+
+.review-kicker {
+  display: block;
+
+  color: #1d5e5e;
+
+  font-size: 6px;
+
+  letter-spacing: 2px;
+
+  font-weight: 700;
+}
+
+.profile-review-header h2 {
+  margin-top: 5px;
+
+  color: #0a2f2f;
+
+  font-family: "Playfair Display", Georgia, serif;
+
+  font-size: 16px;
+
+  line-height: 1.1;
+
+  font-weight: 600;
+}
+
+.review-description {
+  margin-top: 4px;
+
+  color: #6b9292;
+
+  font-size: 7.5px;
+
+  line-height: 1.45;
+}
+
+/* =========================================
+   CATEGORY ICON
+========================================= */
+
+.review-header-icon {
+  width: 31px;
+  height: 31px;
+
+  flex: 0 0 31px;
+
+  display: grid;
+
+  place-items: center;
+
+  color: #1d5e5e;
+
+  border: 1px solid rgba(29, 94, 94, 0.17);
+
+  border-radius: 8px;
+
+  background: rgba(29, 94, 94, 0.05);
+}
+
+/* =========================================
+   SKILL GRID
+========================================= */
+
+.interest-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 6px;
+}
+
+/* =========================================
+   SKILL BUTTON
+========================================= */
+
+.interest-chip {
+  min-height: 37px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 6px;
+
+  padding: 7px 9px;
+
+  border: 1px solid rgba(10, 47, 47, 0.1);
+
+  border-radius: 7px;
+
+  color: #4f7777;
+
+  background: rgba(229, 242, 242, 0.65);
+
+  font-family: "DM Sans", sans-serif;
+
+  font-size: 7.5px;
+
+  font-weight: 500;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition: 0.18s ease;
+}
+
+.interest-chip:hover {
+  transform: translateY(-1px);
+
+  border-color: rgba(29, 94, 94, 0.3);
+
+  color: #0a2f2f;
+
+  background: rgba(245, 251, 251, 0.85);
+}
+
+.interest-chip.selected {
+  border-color: rgba(29, 94, 94, 0.55);
+
+  color: #1d5e5e;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(79, 143, 143, 0.13),
+      rgba(29, 94, 94, 0.055)
+    );
+
+  box-shadow:
+    inset 0 0 12px rgba(29, 94, 94, 0.02);
+}
+
+.interest-chip.selected span {
+  font-weight: 700;
+}
+
+.interest-chip svg {
+  flex-shrink: 0;
+
+  color: #1d5e5e;
+}
+
+/* =========================================
+   CONTINUE BUTTON
+========================================= */
+
+.profile-continue {
+  grid-column: 1 / -1;
+
+  width: 100%;
+
+  min-height: 45px;
+
+  margin-top: 2px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 9px;
+
+  border: 1px solid #1d5e5e;
+
+  border-radius: 8px;
+
+  color: #e5f2f2;
+
+  background:
+    linear-gradient(
+      135deg,
+      #4f8f8f,
+      #1d5e5e
+    );
+
+  font-family: "DM Sans", sans-serif;
+
+  font-size: 9px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.5px;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.profile-continue:hover:not(:disabled) {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 10px 25px rgba(29, 94, 94, 0.2);
+}
+
+.profile-continue:disabled {
+  opacity: 0.55;
+
+  cursor: not-allowed;
+}
+
+.profile-continue svg {
+  transition: transform 0.2s ease;
+}
+
+.profile-continue:hover:not(:disabled) svg {
+  transform: translateX(4px);
+}
+
+/* =========================================
+   SELECTED COUNT
+========================================= */
+
+.selected-count {
+  grid-column: 1 / -1;
+
+  width: fit-content;
+
+  margin: -3px 0 -2px;
+
+  padding: 6px 10px;
+
+  border: 1px solid rgba(29, 94, 94, 0.15);
+
+  border-radius: 20px;
+
+  color: #1d5e5e;
+
+  background: rgba(29, 94, 94, 0.05);
+
+  font-size: 7px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.6px;
+}
+
+/* =========================================
+   LOADING
+========================================= */
+
+.profile-loading {
+  min-height: 100vh;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  color: #1d5e5e;
+}
+
+.profile-loading p {
+  color: #648585;
+
+  font-size: 12px;
+}
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 1050px) {
+
+  .profile-sidebar {
+    grid-template-columns: 1fr;
+
+    gap: 20px;
+  }
+
+  .sidebar-title {
+    max-width: 650px;
+  }
+
+  .sidebar-title p {
+    max-width: 570px;
+  }
+
+  .profile-form-section .profile-form {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 700px) {
+
+  .profile-page {
+    padding-bottom: 30px;
+  }
+
+  .profile-header {
+    width: calc(100% - 20px);
+
+    min-height: 60px;
+
+    padding: 0 14px;
+
+    border-radius: 11px;
+  }
+
+  .profile-main {
+    width: calc(100% - 24px);
+
+    padding-top: 22px;
+
+    gap: 22px;
+  }
+
+  .sidebar-title h2 {
+    font-size: 38px;
+  }
+
+  .sidebar-title p {
+    font-size: 11px;
+  }
+
+  .setup-steps {
+    flex-direction: column;
+
+    align-items: stretch;
+
+    gap: 7px;
+
+    padding: 12px;
+  }
+
+  .setup-step {
+    flex: unset;
+
+    width: 100%;
+  }
+
+  .setup-line {
+    width: 1px;
+
+    height: 14px;
+
+    margin-left: 16px;
+  }
+
+  .form-heading {
+    margin-bottom: 18px;
+  }
+
+  .form-heading h1 {
+    font-size: 36px;
+  }
+
+  .form-heading p {
+    font-size: 10px;
+  }
+
+  .profile-form-section .profile-form {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-review-card {
+    padding: 15px;
+  }
+
+  .profile-review-header h2 {
+    font-size: 17px;
+  }
+
+  .interest-chip {
+    min-height: 38px;
+
+    font-size: 8px;
+  }
+
+  .profile-continue {
+    min-height: 45px;
+  }
+}
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 480px) {
+
+  .profile-progress-text {
+    display: none;
+  }
+
+  .sidebar-title h2 {
+    font-size: 34px;
+  }
+
+  .form-heading h1 {
+    font-size: 33px;
+  }
+
+  .interest-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================
+   REDUCED MOTION
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .profile-review-card,
+  .interest-chip,
+  .profile-continue,
+  .step-icon {
+    transition: none;
+  }
+}
