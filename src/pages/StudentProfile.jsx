@@ -6,6 +6,7 @@ import {
   UserRound,
   Building2,
   CalendarDays,
+  Mail,
   Sparkles,
   Check,
 } from "lucide-react";
@@ -13,25 +14,49 @@ import {
 function StudentProfile() {
   const navigate = useNavigate();
 
+  /* =========================================
+     PROFILE FORM DATA
+     ========================================= */
+
   const [formData, setFormData] = useState({
     name: "",
     education: "",
-    university: "",
-    semester: "",
+    institution: "",
+    yearOfStudy: "",
+    email: "",
   });
+
+  /* =========================================
+     INTERESTS
+     ========================================= */
 
   const [selectedInterests, setSelectedInterests] = useState([]);
 
   const interests = [
-  "Web Development",
-  "Cybersecurity",
-  "Artificial Intelligence",
-  "Data & Analytics",
-  "Cloud Computing",
-  "Design & User Experience",
-];
+    "Web Development",
+    "Cybersecurity",
+    "Artificial Intelligence",
+    "Data & Analytics",
+    "Cloud Computing",
+    "Design & User Experience",
+  ];
 
+  /* =========================================
+     HANDLE PROFILE INPUTS
+     ========================================= */
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  /* =========================================
+     HANDLE INTEREST SELECTION
+     ========================================= */
 
   const toggleInterest = (interest) => {
     setSelectedInterests((prev) =>
@@ -41,25 +66,26 @@ function StudentProfile() {
     );
   };
 
-const handleChange = (e) => {
-  const { name, value } = e.target;
-
-  setFormData((prev) => ({
-    ...prev,
-    [name]: value,
-  }));
-};
+  /* =========================================
+     CONTINUE
+     ========================================= */
 
   const handleContinue = (e) => {
     e.preventDefault();
 
-    // Frontend-only for now
+    // Frontend only for now.
+    // Your teammate can connect formData and
+    // selectedInterests to Supabase later.
+
     navigate("/career-selection");
   };
 
   return (
     <div className="profile-page">
-      {/* HEADER */}
+      {/* =========================================
+          HEADER
+      ========================================== */}
+
       <header className="profile-header">
         <Link to="/" className="auth-brand">
           <div className="brand-mark">
@@ -77,9 +103,15 @@ const handleChange = (e) => {
         </div>
       </header>
 
-      {/* MAIN */}
+      {/* =========================================
+          MAIN
+      ========================================== */}
+
       <main className="profile-main">
-        {/* SIDEBAR */}
+        {/* =======================================
+            LEFT SIDEBAR
+        ======================================== */}
+
         <aside className="profile-sidebar">
           <div className="sidebar-title">
             <span className="sidebar-kicker">YOUR JOURNEY</span>
@@ -87,16 +119,20 @@ const handleChange = (e) => {
             <h2>
               Let's understand
               <br />
-              <span>you first.</span>
+              <span>you better.</span>
             </h2>
 
             <p>
-              A better understanding of your background helps us create a
-              more relevant career journey.
+              Your profile helps CareerPath AI understand your starting
+              point and create a more relevant career journey for you.
             </p>
           </div>
 
+          {/* JOURNEY STEPS */}
+
           <div className="setup-steps">
+            {/* STEP 01 */}
+
             <div className="setup-step active">
               <div className="step-icon">
                 <UserRound size={17} />
@@ -109,6 +145,8 @@ const handleChange = (e) => {
             </div>
 
             <div className="setup-line" />
+
+            {/* STEP 02 */}
 
             <div className="setup-step">
               <div className="step-icon">
@@ -123,6 +161,8 @@ const handleChange = (e) => {
 
             <div className="setup-line" />
 
+            {/* STEP 03 */}
+
             <div className="setup-step">
               <div className="step-icon">
                 <GraduationCap size={17} />
@@ -136,137 +176,292 @@ const handleChange = (e) => {
           </div>
         </aside>
 
-        {/* FORM */}
+        {/* =======================================
+            RIGHT CONTENT
+        ======================================== */}
+
         <section className="profile-form-section">
+          {/* =====================================
+              PAGE HEADING
+          ====================================== */}
+
           <div className="form-heading">
             <div className="profile-kicker">
               <span />
-              ABOUT YOU
+              YOUR PROFILE
             </div>
 
             <h1>
-              Tell us a little
+              Tell us a little more 
               <br />
-              about <span>yourself.</span>
+              <span>about yourself.</span>
             </h1>
 
             <p>
-              This information will help CareerPath AI understand your
-              current starting point.
+              Tell us a little more about yourself and choose the areas
+              you're interested in.
             </p>
           </div>
 
-          <form className="profile-form" onSubmit={handleContinue}>
-            {/* NAME */}
-            <div className="profile-input-group">
-              <label htmlFor="profile-name">Full Name</label>
+          {/* =====================================
+              PROFILE FORM
+          ====================================== */}
 
-              <div className="profile-input">
-                <UserRound size={17} />
+          <form
+            className="profile-form"
+            onSubmit={handleContinue}
+          >
+            {/* ===================================
+                PROFILE DETAILS CARD
+            ==================================== */}
 
-                <input
-                  id="profile-name"
-                  name="name"
-                  type="text"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="Enter your full name"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* EDUCATION */}
-            <div className="profile-input-group">
-              <label htmlFor="education">Education</label>
-
-              <div className="profile-input">
-                <GraduationCap size={17} />
-
-                <select
-                  id="education"
-                  name="education"
-                  value={formData.education}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Select your education</option>
-                  <option value="bca">
-                    Bachelor of Computer Applications
-                  </option>
-                  <option value="btech">
-                    Bachelor of Technology
-                  </option>
-                  <option value="bsc">
-                    Bachelor of Science
-                  </option>
-                  <option value="bba">
-                    Bachelor of Business Administration
-                  </option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-            </div>
-
-            {/* UNIVERSITY */}
-            <div className="profile-input-group">
-              <label htmlFor="university">
-                University / Institution
-              </label>
-
-              <div className="profile-input">
-                <Building2 size={17} />
-
-                <input
-                  id="university"
-                  name="university"
-                  type="text"
-                  value={formData.university}
-                  onChange={handleChange}
-                  placeholder="Enter your university or college"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* SEMESTER */}
-            <div className="profile-input-group">
-              <label htmlFor="semester">Current Semester</label>
-
-              <div className="profile-input">
-                <CalendarDays size={17} />
-
-                <select
-                  id="semester"
-                  name="semester"
-                  value={formData.semester}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Select semester</option>
-                  <option value="1">Semester 1</option>
-                  <option value="2">Semester 2</option>
-                  <option value="3">Semester 3</option>
-                  <option value="4">Semester 4</option>
-                  <option value="5">Semester 5</option>
-                  <option value="6">Semester 6</option>
-                  <option value="7">Semester 7</option>
-                  <option value="8">Semester 8</option>
-                </select>
-              </div>
-            </div>
-
-            {/* INTERESTS */}
-            <div className="interest-section">
-              <div className="interest-heading">
+            <section className="profile-review-card">
+              <div className="profile-review-header">
                 <div>
-                  <label>Areas You're Interested In</label>
-                  <p>Select all that interest you.</p>
+                  <span className="review-kicker">
+                    BASIC INFORMATION
+                  </span>
+
+                  <h2>Your profile details</h2>
+
+                  <p className="review-description">
+                    Fill in your details so CareerPath AI can understand
+                    your current academic background.
+                  </p>
                 </div>
 
-                <span>
+                <div className="review-header-icon">
+                  <UserRound size={20} />
+                </div>
+              </div>
+
+              <div className="profile-info-grid">
+                {/* FULL NAME */}
+
+                <div className="profile-info-item">
+                  <div className="profile-info-icon">
+                    <UserRound size={17} />
+                  </div>
+
+                  <div className="profile-info-content">
+                    <label htmlFor="profile-name">
+                      Full Name
+                    </label>
+
+                    <input
+                      id="profile-name"
+                      name="name"
+                      type="text"
+                      value={formData.name}
+                      onChange={handleChange}
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+                </div>
+
+                {/* EDUCATION */}
+
+                <div className="profile-info-item">
+                  <div className="profile-info-icon">
+                    <GraduationCap size={17} />
+                  </div>
+
+                  <div className="profile-info-content">
+                    <label htmlFor="education">
+                      Education
+                    </label>
+
+                    <select
+                      id="education"
+                      name="education"
+                      value={formData.education}
+                      onChange={handleChange}
+                    >
+                      <option value="">
+                        Select your education level
+                      </option>
+
+                      <option value="Class 11">
+                        Class 11
+                      </option>
+
+                      <option value="Class 12">
+                        Class 12
+                      </option>
+
+                      <option value="Diploma">
+                        Diploma
+                      </option>
+
+                      <option value="Bachelor of Computer Applications">
+                        Bachelor of Computer Applications
+                      </option>
+
+                      <option value="Bachelor of Technology / Engineering">
+                        Bachelor of Technology / Engineering
+                      </option>
+
+                      <option value="Bachelor of Science">
+                        Bachelor of Science
+                      </option>
+
+                      <option value="Bachelor of Business Administration">
+                        Bachelor of Business Administration
+                      </option>
+
+                      <option value="Bachelor of Arts">
+                        Bachelor of Arts
+                      </option>
+
+                      <option value="Bachelor of Commerce">
+                        Bachelor of Commerce
+                      </option>
+
+                      <option value="Master of Computer Applications">
+                        Master of Computer Applications
+                      </option>
+
+                      <option value="Master of Business Administration">
+                        Master of Business Administration
+                      </option>
+
+                      <option value="Master of Science">
+                        Master of Science
+                      </option>
+
+                      <option value="M.Tech / M.E.">
+                        M.Tech / M.E.
+                      </option>
+
+                      <option value="PhD">
+                        PhD
+                      </option>
+
+                      <option value="Other">
+                        Other
+                      </option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* INSTITUTION */}
+
+                <div className="profile-info-item">
+                  <div className="profile-info-icon">
+                    <Building2 size={17} />
+                  </div>
+
+                  <div className="profile-info-content">
+                    <label htmlFor="institution">
+                      Institution
+                    </label>
+
+                    <input
+                      id="institution"
+                      name="institution"
+                      type="text"
+                      value={formData.institution}
+                      onChange={handleChange}
+                      placeholder="Enter your institution"
+                    />
+                  </div>
+                </div>
+
+                {/* YEAR OF STUDY */}
+
+                <div className="profile-info-item">
+                  <div className="profile-info-icon">
+                    <CalendarDays size={17} />
+                  </div>
+
+                  <div className="profile-info-content">
+                    <label htmlFor="yearOfStudy">
+                      Year of Study
+                    </label>
+
+                    <select
+                      id="yearOfStudy"
+                      name="yearOfStudy"
+                      value={formData.yearOfStudy}
+                      onChange={handleChange}
+                    >
+                      <option value="">
+                        Enter your year of study
+                      </option>
+
+                      <option value="1st Year">
+                        1st Year
+                      </option>
+
+                      <option value="2nd Year">
+                        2nd Year
+                      </option>
+
+                      <option value="3rd Year">
+                        3rd Year
+                      </option>
+
+                      <option value="4th Year">
+                        4th Year
+                      </option>
+
+                      <option value="Final Year">
+                        Final Year
+                      </option>
+
+                      <option value="Not Applicable">
+                        Not Applicable
+                      </option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* EMAIL */}
+
+                <div className="profile-info-item profile-info-item-full">
+                  <div className="profile-info-icon">
+                    <Mail size={17} />
+                  </div>
+
+                  <div className="profile-info-content">
+                    <label htmlFor="email">
+                      Email
+                    </label>
+
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="Enter your email"
+                    />
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* ===================================
+                INTERESTS CARD
+            ==================================== */}
+
+            <section className="profile-review-card interests-card">
+              <div className="profile-review-header">
+                <div>
+                  <span className="review-kicker">
+                    INTERESTS
+                  </span>
+
+                  <h2>Areas You're Interested In</h2>
+
+                  <p className="review-description">
+                    Select all areas that interest you.
+                  </p>
+                </div>
+
+                <div className="selected-count">
                   {selectedInterests.length} selected
-                </span>
+                </div>
               </div>
 
               <div className="interest-grid">
@@ -276,24 +471,34 @@ const handleChange = (e) => {
 
                   return (
                     <button
-                      type="button"
                       key={interest}
+                      type="button"
                       className={`interest-chip ${
                         selected ? "selected" : ""
                       }`}
-                      onClick={() => toggleInterest(interest)}
+                      onClick={() =>
+                        toggleInterest(interest)
+                      }
                     >
                       <span>{interest}</span>
 
-                      {selected && <Check size={15} />}
+                      {selected && (
+                        <Check size={15} />
+                      )}
                     </button>
                   );
                 })}
               </div>
-            </div>
+            </section>
 
-            {/* CONTINUE */}
-            <button type="submit" className="profile-continue">
+            {/* ===================================
+                CONTINUE BUTTON
+            ==================================== */}
+
+            <button
+              type="submit"
+              className="profile-continue"
+            >
               Continue to Career Selection
               <ArrowRight size={17} />
             </button>
