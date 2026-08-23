@@ -1,143 +1,391 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ArrowRight,
-  BarChart3,
   BrainCircuit,
   Check,
   Code2,
+  Database,
   Palette,
-  Server,
   ShieldCheck,
   Sparkles,
+  Server,
+  BarChart3,
 } from "lucide-react";
 
-import "../App.css";
+import { supabase } from "../supabaseClient";
+import "./CareerSelection.css";
 
-const careers = [
+const CAREERS = [
   {
-    id: "Frontend Developer",
-    title: "Frontend Developer",
+    id: "frontend",
+    name: "Frontend Developer",
     description:
-      "Build modern, responsive interfaces and engaging web experiences.",
+      "Build beautiful, responsive and interactive websites and web applications.",
     icon: Code2,
-    skills: "HTML • CSS • JavaScript • React",
+    skills: [
+      "HTML",
+      "HTML & Web Semantics",
+      "CSS",
+      "CSS & Responsive Design",
+      "JavaScript",
+      "React",
+      "React & Component Development",
+      "UI Design",
+    ],
   },
   {
-    id: "Backend Developer",
-    title: "Backend Developer",
+    id: "backend",
+    name: "Backend Developer",
     description:
-      "Design reliable servers, APIs, databases, and backend systems.",
+      "Build APIs, server-side applications, databases and the systems behind modern products.",
     icon: Server,
-    skills: "Node.js • APIs • SQL • Authentication",
+    skills: [
+      "Node.js",
+      "Node.js & Server Development",
+      "JavaScript",
+      "Python",
+      "APIs",
+      "API Development",
+      "REST APIs",
+      "SQL",
+      "Databases",
+      "Databases & SQL",
+    ],
   },
   {
-    id: "Data Analyst",
-    title: "Data Analyst",
+    id: "data",
+    name: "Data Analyst",
     description:
-      "Turn raw data into useful insights that support better decisions.",
+      "Turn raw data into useful insights that help organizations make better decisions.",
     icon: BarChart3,
-    skills: "SQL • Python • Statistics • Visualization",
+    skills: [
+      "Python",
+      "SQL",
+      "Statistics",
+      "Data Analysis",
+      "Data Cleaning",
+      "Data Visualization",
+      "Excel",
+      "Pandas",
+    ],
   },
   {
-    id: "UI/UX Designer",
-    title: "UI/UX Designer",
+    id: "uiux",
+    name: "UI/UX Designer",
     description:
-      "Create intuitive digital experiences centered around real users.",
+      "Design intuitive digital experiences focused on users, usability and visual communication.",
     icon: Palette,
-    skills: "Research • Wireframes • UI • Usability",
+    skills: [
+      "UI Design",
+      "UX Design",
+      "User Research",
+      "Wireframing",
+      "Prototyping",
+      "Figma",
+      "Accessibility",
+      "Usability",
+    ],
   },
   {
-    id: "Cybersecurity Analyst",
-    title: "Cybersecurity Analyst",
+    id: "cybersecurity",
+    name: "Cybersecurity Analyst",
     description:
-      "Protect systems, networks, applications, and sensitive information.",
+      "Protect systems, networks and applications from security threats and vulnerabilities.",
     icon: ShieldCheck,
-    skills: "Networking • Linux • Security • Incident Response",
+    skills: [
+      "Linux",
+      "Linux & System Fundamentals",
+      "Networking",
+      "Cybersecurity",
+      "Web Security",
+      "Authentication",
+      "Authentication & Access Control",
+      "Incident Response",
+      "Security",
+    ],
   },
   {
-    id: "AI/ML Engineer",
-    title: "AI/ML Engineer",
+    id: "aiml",
+    name: "AI/ML Engineer",
     description:
-      "Build intelligent systems using machine learning and data.",
+      "Build intelligent systems using Python, machine learning, data and neural networks.",
     icon: BrainCircuit,
-    skills: "Python • ML • Data • Neural Networks",
+    skills: [
+      "Python",
+      "Python for AI/ML",
+      "Machine Learning",
+      "Machine Learning Fundamentals",
+      "Artificial Intelligence",
+      "AI",
+      "Data Science",
+      "Statistics",
+      "Neural Networks",
+    ],
   },
 ];
 
+function normalizeSkill(skill) {
+  return skill
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9\s]/g, "")
+    .replace(/\s+/g, " ");
+}
+
+function calculateMatch(interests, careerSkills) {
+  if (!interests.length) {
+    return 0;
+  }
+
+  const normalizedInterests = interests.map(normalizeSkill);
+
+  const matches = careerSkills.filter((careerSkill) => {
+    const normalizedCareerSkill = normalizeSkill(careerSkill);
+
+    return normalizedInterests.some((interest) => {
+      return (
+        interest === normalizedCareerSkill ||
+        interest.includes(normalizedCareerSkill) ||
+        normalizedCareerSkill.includes(interest)
+      );
+    });
+  });
+
+  const uniqueMatches = [...new Set(matches.map(normalizeSkill))];
+
+  return Math.min(
+    100,
+    Math.round((uniqueMatches.length / Math.max(careerSkills.length, 1)) * 100)
+  );
+}
+
 function CareerSelection() {
   const navigate = useNavigate();
+
+  const [interests, setInterests] = useState([]);
   const [selectedCareer, setSelectedCareer] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleCareerSelect = (career) => {
-    setSelectedCareer(career);
-  };
+  useEffect(() => {
+    loadStudentInterests();
+  }, []);
 
-  const handleStartAssessment = () => {
-    if (!selectedCareer) return;
+  async function loadStudentInterests() {
+    setLoading(true);
+    setError("");
 
-    // Save the selected career so it can also be accessed
-    // after page navigation.
-    localStorage.setItem("selectedCareer", selectedCareer);
+    try {
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
 
-    navigate("/assessment", {
-      state: {
-        career: selectedCareer,
-      },
-    });
-  };
+      if (authError) {
+        throw authError;
+      }
+
+      if (!user) {
+        navigate("/login");
+        return;
+      }
+
+      const { data, error: studentError } = await supabase
+        .from("students")
+        .select("interests")
+        .eq("auth_id", user.id)
+        .maybeSingle();
+
+      if (studentError) {
+        throw studentError;
+      }
+
+      let studentInterests = data?.interests || [];
+
+      /*
+       * Supports both:
+       * ["HTML", "JavaScript"]
+       *
+       * and, if your Supabase column happens to contain
+       * a JSON string:
+       * '["HTML","JavaScript"]'
+       */
+      if (typeof studentInterests === "string") {
+        try {
+          studentInterests = JSON.parse(studentInterests);
+        } catch {
+          studentInterests = studentInterests
+            .split(",")
+            .map((item) => item.trim())
+            .filter(Boolean);
+        }
+      }
+
+      if (!Array.isArray(studentInterests)) {
+        studentInterests = [];
+      }
+
+      setInterests(studentInterests);
+    } catch (err) {
+      console.error("Error loading student interests:", err);
+
+      setError(
+        "We couldn't load your interests. Please go back to your profile and try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const careerMatches = useMemo(() => {
+    return CAREERS.map((career) => ({
+      ...career,
+      match: calculateMatch(interests, career.skills),
+    })).sort((a, b) => b.match - a.match);
+  }, [interests]);
+
+  const recommendedCareer = careerMatches[0];
+
+  function handleCareerSelect(careerId) {
+    setSelectedCareer(careerId);
+    setError("");
+  }
+
+  async function handleContinue() {
+    if (!selectedCareer) {
+      setError("Please select a career before continuing.");
+      return;
+    }
+
+    setSaving(true);
+    setError("");
+
+    try {
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+
+      if (authError) {
+        throw authError;
+      }
+
+      if (!user) {
+        navigate("/login");
+        return;
+      }
+
+      const career = CAREERS.find((item) => item.id === selectedCareer);
+
+      if (!career) {
+        throw new Error("Selected career was not found.");
+      }
+
+      /*
+       * IMPORTANT:
+       * This assumes your students table has a column named
+       * selected_career.
+       *
+       * If your column has a different name, change it here.
+       */
+      const { error: updateError } = await supabase
+        .from("students")
+        .update({
+          selected_career: career.name,
+        })
+        .eq("auth_id", user.id);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      navigate("/assessment");
+    } catch (err) {
+      console.error("Error saving career:", err);
+
+      setError(
+        err.message ||
+          "Something went wrong while saving your career selection."
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="career-selection-page">
+        <div className="career-selection-container career-loading">
+          <Sparkles size={24} />
+          <p>Analyzing your interests...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="career-selection-page">
-
-      {/* HEADER */}
-      <header className="career-selection-header">
-
-        <Link to="/" className="career-brand">
-          <div className="career-brand-mark">
-            <Sparkles size={18} />
+      <div className="career-selection-container">
+        {/* HEADER */}
+        <header className="career-selection-header">
+          <div className="career-logo">
+            <Sparkles size={20} />
           </div>
 
-          <div className="career-brand-text">
-            <span>CAREERPATH</span>
-            <small>AI</small>
+          <div>
+            <span className="career-brand">CAREERPATH</span>
+            <span className="career-brand-ai">AI</span>
           </div>
-        </Link>
+        </header>
 
-        <div className="career-step">
-          CAREER SELECTION
-          <span>02 / 03</span>
-        </div>
-
-      </header>
-
-      {/* MAIN */}
-      <main className="career-selection-container">
-
-        {/* INTRO */}
+        {/* HEADING */}
         <section className="career-selection-heading">
-
-          <div className="career-kicker">
-            <span />
-            FIND YOUR DIRECTION
-            <span />
-          </div>
+          <span className="career-kicker">YOUR CAREER PATH</span>
 
           <h1>
-            Choose your <em>career path.</em>
+            Choose the career that
+            <br />
+            <span>feels right for you.</span>
           </h1>
 
           <p>
-            Select the career you want to assess your current skills for.
+            We've analyzed your interests and highlighted the careers that
+            match your current skill profile.
           </p>
-
         </section>
+
+        {/* INTEREST SUMMARY */}
+        {interests.length > 0 && (
+          <section className="interest-summary">
+            <div className="interest-summary-label">
+              <span>YOUR INTERESTS</span>
+              <strong>{interests.length} selected</strong>
+            </div>
+
+            <div className="interest-tags">
+              {interests.map((interest) => (
+                <span key={interest} className="interest-tag">
+                  {interest}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ERROR */}
+        {error && <div className="career-error">{error}</div>}
 
         {/* CAREER GRID */}
         <section className="career-grid">
-
-          {careers.map((career) => {
+          {careerMatches.map((career) => {
             const Icon = career.icon;
+
+            const isRecommended =
+              recommendedCareer && career.id === recommendedCareer.id;
+
             const isSelected = selectedCareer === career.id;
 
             return (
@@ -149,100 +397,76 @@ function CareerSelection() {
                 }`}
                 onClick={() => handleCareerSelect(career.id)}
               >
+                {isRecommended && (
+                  <div className="recommended-badge">
+                    <Sparkles size={13} />
+                    AI RECOMMENDED
+                  </div>
+                )}
 
-                {/* SELECTED CHECK */}
-                <div className="career-check">
-                  {isSelected && <Check size={14} strokeWidth={3} />}
-                </div>
-
-                {/* ICON */}
-                <div className="career-icon">
-                  <Icon size={25} strokeWidth={1.5} />
-                </div>
-
-                {/* CONTENT */}
-                <div className="career-card-content">
-
-                  <span className="career-number">
-                    {String(careers.indexOf(career) + 1).padStart(2, "0")}
-                  </span>
-
-                  <h2>{career.title}</h2>
-
-                  <p>{career.description}</p>
-
-                  <div className="career-skills">
-                    {career.skills}
+                <div className="career-card-top">
+                  <div className="career-icon">
+                    <Icon size={22} />
                   </div>
 
+                  <div className="career-match">
+                    {career.match}% match
+                  </div>
                 </div>
 
-                {/* ARROW */}
-                <div className="career-card-arrow">
-                  <ArrowRight size={18} />
-                </div>
+                <h2>{career.name}</h2>
 
+                <p>{career.description}</p>
+
+                <div className="career-card-footer">
+                  <span>
+                    {career.match >= 70
+                      ? "Strong match"
+                      : career.match >= 40
+                      ? "Good match"
+                      : "Explore this path"}
+                  </span>
+
+                  <div className="career-radio">
+                    {isSelected && <Check size={15} />}
+                  </div>
+                </div>
               </button>
             );
           })}
-
         </section>
 
         {/* SELECTED CAREER */}
-        <section
-          className={`selected-career ${
-            selectedCareer ? "selected-career-active" : ""
-          }`}
-        >
+        <div className="selected-career">
+          <div>
+            <span>SELECTED CAREER</span>
 
-          <div className="selected-career-info">
-
-            <span className="selected-label">
-              SELECTED CAREER
-            </span>
-
-            {selectedCareer ? (
-              <strong>{selectedCareer}</strong>
-            ) : (
-              <span className="selected-placeholder">
-                Choose a career above to continue
-              </span>
-            )}
-
+            <strong>
+              {selectedCareer
+                ? CAREERS.find((career) => career.id === selectedCareer)?.name
+                : "Choose a career above"}
+            </strong>
           </div>
 
           {selectedCareer && (
-            <div className="selected-status">
-              <Check size={15} />
-              SELECTED
+            <div className="selected-career-check">
+              <Check size={17} />
             </div>
           )}
+        </div>
 
-        </section>
-
-        {/* START BUTTON */}
+        {/* CONTINUE */}
         <button
           type="button"
           className="career-start-button"
-          disabled={!selectedCareer}
-          onClick={handleStartAssessment}
+          disabled={!selectedCareer || saving}
+          onClick={handleContinue}
         >
-          <span>
-            {selectedCareer
-              ? `START ${selectedCareer.toUpperCase()} ASSESSMENT`
-              : "SELECT A CAREER TO CONTINUE"}
-          </span>
+          {saving ? "Saving..." : "Continue to Assessment"}
 
-          <ArrowRight size={18} />
-
+          {!saving && <ArrowRight size={17} />}
         </button>
-
-        <p className="assessment-note">
-          You'll answer 5 skill-based questions tailored to your selected career.
-        </p>
-
-      </main>
-
+      </div>
     </div>
   );
 }
