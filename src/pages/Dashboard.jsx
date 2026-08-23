@@ -1,522 +1,360 @@
-import { useLocation, useNavigate, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ArrowRight,
   Award,
-  BarChart3,
-  BrainCircuit,
+  Brain,
   CheckCircle2,
-  ChevronRight,
-  GraduationCap,
+  Loader2,
   LogOut,
   Sparkles,
   Target,
   TrendingUp,
 } from "lucide-react";
+import { supabase } from "../supabaseClient";
+import "./Dashboard.css";
 
 function Dashboard() {
-  const location = useLocation();
   const navigate = useNavigate();
 
-  const {
-    career = "Frontend Developer",
-    score = 0,
-    total = 25,
-    answers = {},
-    questions = [],
-  } = location.state || {};
+  const [user, setUser] = useState(null);
+  const [student, setStudent] = useState(null);
+  const [assessment, setAssessment] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
+  useEffect(() => {
+    loadDashboard();
+  }, []);
 
-  const getLevel = () => {
-    if (percentage >= 80) return "Strong Foundation";
-    if (percentage >= 60) return "Developing";
-    return "Needs Improvement";
-  };
+  async function loadDashboard() {
+    setLoading(true);
+    setError("");
 
-  const getMessage = () => {
+    try {
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+
+      if (authError) throw authError;
+
+      if (!user) {
+        navigate("/login");
+        return;
+      }
+
+      setUser(user);
+
+      const { data: studentData, error: studentError } = await supabase
+        .from("students")
+        .select("*")
+        .eq("auth_id", user.id)
+        .maybeSingle();
+
+      if (studentError) throw studentError;
+
+      setStudent(studentData);
+
+      const { data: assessmentData, error: assessmentError } =
+        await supabase
+          .from("assessment_results")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+      if (assessmentError) throw assessmentError;
+
+      setAssessment(assessmentData);
+    } catch (err) {
+      console.error("Dashboard loading error:", err);
+      setError(err.message || "Unable to load your dashboard.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    navigate("/login");
+  }
+
+  function getPerformanceLabel(percentage) {
+    if (percentage >= 80) return "Excellent";
+    if (percentage >= 60) return "Good";
+    if (percentage >= 40) return "Needs Improvement";
+    return "Beginner";
+  }
+
+  function getPerformanceMessage(percentage) {
     if (percentage >= 80) {
-      return "You already have a strong foundation for this career path.";
+      return "You have a strong foundation for your selected career.";
     }
 
     if (percentage >= 60) {
-      return "You have a good starting point. Strengthening a few key skills can move you closer to your target role.";
+      return "You have a good foundation. A few focused improvements can take you further.";
     }
 
-    return "You have room to grow. Focus on the recommended skills to build a stronger foundation.";
-  };
-
-  // Build skill results from assessment questions
-  const skillResults = {};
-
-  questions.forEach((question) => {
-    const skill = question.skill_mapping || question.core_skill;
-
-    if (!skill) return;
-
-    if (!skillResults[skill]) {
-      skillResults[skill] = {
-        skill,
-        correct: 0,
-        total: 0,
-      };
+    if (percentage >= 40) {
+      return "You have started well. Focus on strengthening your core skills.";
     }
 
-    skillResults[skill].total += 1;
-
-    const answer = answers[question.assessment_id];
-
-    if (answer === question.correct_answer) {
-      skillResults[skill].correct += 1;
-    }
-  });
-
-  let skills = Object.values(skillResults);
-
-  // Fallback for dashboard preview
-  if (!skills.length) {
-    skills = [
-      {
-        skill: "Core Technical Skills",
-        correct: percentage >= 70 ? 4 : 2,
-        total: 5,
-      },
-      {
-        skill: "Problem Solving",
-        correct: percentage >= 70 ? 4 : 3,
-        total: 5,
-      },
-      {
-        skill: "Tools & Technologies",
-        correct: percentage >= 70 ? 3 : 2,
-        total: 5,
-      },
-    ];
+    return "This is a great starting point. Let's build your skills step by step.";
   }
+
+  if (loading) {
+    return (
+      <div className="dashboard-page">
+        <div className="dashboard-loading">
+          <Loader2 className="dashboard-spinner" size={30} />
+          <p>Preparing your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="dashboard-page">
+        <div className="dashboard-error">
+          <Sparkles size={32} />
+          <h1>Something went wrong</h1>
+          <p>{error}</p>
+
+          <button type="button" onClick={loadDashboard}>
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const career =
+    assessment?.career || student?.selected_career || "Your Career";
+
+  const score = assessment?.score ?? student?.assessment_score ?? 0;
+
+  const totalScore =
+    assessment?.total_score ?? student?.assessment_total ?? 25;
+
+  const percentage =
+    assessment?.percentage ?? student?.assessment_percentage ?? 0;
+
+  const performance = getPerformanceLabel(percentage);
+  const performanceMessage = getPerformanceMessage(percentage);
 
   return (
     <div className="dashboard-page">
+      <div className="dashboard-container">
+        <header className="dashboard-header">
+          <button
+            type="button"
+            className="dashboard-logo"
+            onClick={() => navigate("/")}
+          >
+            <Sparkles size={19} />
+          </button>
 
-      {/* HEADER */}
-      <header className="dashboard-header">
-
-        <Link to="/" className="dashboard-brand">
-          <div className="dashboard-brand-mark">
-            <Sparkles size={17} />
-          </div>
-
-          <div>
+          <div className="dashboard-brand">
             <span>CAREERPATH</span>
             <small>AI</small>
           </div>
-        </Link>
 
-        <div className="dashboard-header-right">
-          <span className="dashboard-status">
-            <span className="status-dot" />
-            ASSESSMENT COMPLETE
-          </span>
+          <div className="dashboard-header-actions">
+            <span className="dashboard-user">{user?.email}</span>
 
-          <button
-            className="dashboard-logout"
-            onClick={() => navigate("/")}
-          >
-            <LogOut size={16} />
-            Exit
-          </button>
-        </div>
+            <button
+              type="button"
+              className="dashboard-logout"
+              onClick={handleLogout}
+              title="Logout"
+            >
+              <LogOut size={17} />
+            </button>
+          </div>
+        </header>
 
-      </header>
-
-
-      {/* MAIN */}
-      <main className="dashboard-main">
-
-        {/* HERO */}
         <section className="dashboard-hero">
-
-          <div className="hero-copy">
-
-            <span className="dashboard-kicker">
-              YOUR CAREERPATH
-            </span>
+          <div>
+            <div className="dashboard-kicker">
+              <span />
+              YOUR CAREER DASHBOARD
+            </div>
 
             <h1>
-              Your path to becoming a
-              <span>{career}</span>
+              Welcome back,
+              <br />
+              <span>{career}</span> explorer.
             </h1>
 
             <p>
-              {getMessage()}
+              Here's a snapshot of your current skill level and assessment
+              performance.
             </p>
-
-            <div className="hero-actions">
-
-              <button
-                className="gold-button"
-                onClick={() => navigate("/career-selection")}
-              >
-                Explore Career Paths
-                <ArrowRight size={17} />
-              </button>
-
-              <button
-                className="outline-button"
-                onClick={() =>
-                  navigate("/assessment", {
-                    state: { career },
-                  })
-                }
-              >
-                Retake Assessment
-              </button>
-
-            </div>
-
           </div>
 
-
-          {/* SCORE */}
-          <div className="score-card">
-
-            <div className="score-card-top">
-              <span>OVERALL SCORE</span>
-              <Award size={19} />
-            </div>
-
-            <div className="score-circle">
-
-              <div>
-                <strong>{percentage}%</strong>
-                <span>SKILL MATCH</span>
-              </div>
-
-            </div>
-
-            <div className="score-bottom">
-              <strong>{getLevel()}</strong>
-              <span>
-                {score} / {total} points
-              </span>
-            </div>
-
+          <div className="dashboard-hero-icon">
+            <Brain size={42} />
           </div>
-
         </section>
 
-
-        {/* STATS */}
         <section className="dashboard-stats">
-
-          <div className="stat-card">
-            <div className="stat-icon">
-              <Target size={18} />
+          <div className="dashboard-stat-card">
+            <div className="dashboard-stat-icon">
+              <Target size={21} />
             </div>
 
             <div>
-              <span>TARGET CAREER</span>
+              <span>SELECTED CAREER</span>
               <strong>{career}</strong>
             </div>
           </div>
 
-
-          <div className="stat-card">
-            <div className="stat-icon">
-              <BarChart3 size={18} />
+          <div className="dashboard-stat-card">
+            <div className="dashboard-stat-icon">
+              <Award size={21} />
             </div>
 
             <div>
               <span>ASSESSMENT SCORE</span>
+              <strong>
+                {score}/{totalScore}
+              </strong>
+            </div>
+          </div>
+
+          <div className="dashboard-stat-card">
+            <div className="dashboard-stat-icon">
+              <TrendingUp size={21} />
+            </div>
+
+            <div>
+              <span>PERFORMANCE</span>
               <strong>{percentage}%</strong>
             </div>
           </div>
-
-
-          <div className="stat-card">
-            <div className="stat-icon">
-              <BrainCircuit size={18} />
-            </div>
-
-            <div>
-              <span>SKILLS ANALYZED</span>
-              <strong>{skills.length}</strong>
-            </div>
-          </div>
-
-
-          <div className="stat-card">
-            <div className="stat-icon">
-              <TrendingUp size={18} />
-            </div>
-
-            <div>
-              <span>STATUS</span>
-              <strong>{getLevel()}</strong>
-            </div>
-          </div>
-
         </section>
 
-
-        {/* CONTENT GRID */}
-        <section className="dashboard-grid">
-
-          {/* SKILL BREAKDOWN */}
-          <div className="dashboard-panel skills-panel">
-
-            <div className="panel-heading">
-
+        <section className="dashboard-result-grid">
+          <div className="dashboard-score-card">
+            <div className="dashboard-card-heading">
               <div>
-                <span className="panel-kicker">
-                  SKILL ANALYSIS
+                <span>ASSESSMENT RESULT</span>
+                <h2>Your current skill level</h2>
+              </div>
+
+              <CheckCircle2 size={24} />
+            </div>
+
+            <div className="dashboard-score">
+              <div
+                className="dashboard-score-circle"
+                style={{
+                  "--progress": `${percentage * 3.6}deg`,
+                }}
+              >
+                <div className="dashboard-score-inner">
+                  <strong>{percentage}%</strong>
+                  <span>Score</span>
+                </div>
+              </div>
+
+              <div className="dashboard-performance">
+                <span className="dashboard-performance-label">
+                  {performance}
                 </span>
 
-                <h2>Your skill breakdown</h2>
+                <p>{performanceMessage}</p>
               </div>
-
-              <BarChart3 size={20} />
-
             </div>
-
-
-            <div className="skills-list">
-
-              {skills.map((item, index) => {
-
-                const skillPercentage =
-                  item.total > 0
-                    ? Math.round(
-                        (item.correct / item.total) * 100
-                      )
-                    : 0;
-
-                return (
-                  <div className="skill-row" key={index}>
-
-                    <div className="skill-row-header">
-
-                      <span>{item.skill}</span>
-
-                      <strong>
-                        {skillPercentage}%
-                      </strong>
-
-                    </div>
-
-                    <div className="skill-progress">
-
-                      <div
-                        style={{
-                          width: `${skillPercentage}%`,
-                        }}
-                      />
-
-                    </div>
-
-                    <small>
-                      {skillPercentage >= 70
-                        ? "Strong"
-                        : skillPercentage >= 50
-                        ? "Developing"
-                        : "Needs focus"}
-                    </small>
-
-                  </div>
-                );
-              })}
-
-            </div>
-
           </div>
 
-
-          {/* RECOMMENDATIONS */}
-          <div className="dashboard-panel">
-
-            <div className="panel-heading">
-
+          <div className="dashboard-career-card">
+            <div className="dashboard-card-heading">
               <div>
-                <span className="panel-kicker">
-                  AI INSIGHTS
-                </span>
-
-                <h2>Recommended next steps</h2>
+                <span>CAREER PATH</span>
+                <h2>{career}</h2>
               </div>
 
-              <Sparkles size={20} />
-
+              <Target size={24} />
             </div>
 
+            <p>
+              Your assessment has been evaluated based on the skills associated
+              with your selected career.
+            </p>
 
-            <div className="recommendation-list">
-
-              <div className="recommendation">
-
-                <div className="recommendation-number">
-                  01
-                </div>
-
-                <div>
-                  <strong>
-                    Strengthen your core skills
-                  </strong>
-
-                  <p>
-                    Focus on the skills where your
-                    assessment score is below 70%.
-                  </p>
-                </div>
-
-                <ChevronRight size={17} />
-
-              </div>
-
-
-              <div className="recommendation">
-
-                <div className="recommendation-number">
-                  02
-                </div>
-
-                <div>
-                  <strong>
-                    Build a practical project
-                  </strong>
-
-                  <p>
-                    Apply what you learn through a
-                    real-world portfolio project.
-                  </p>
-                </div>
-
-                <ChevronRight size={17} />
-
-              </div>
-
-
-              <div className="recommendation">
-
-                <div className="recommendation-number">
-                  03
-                </div>
-
-                <div>
-                  <strong>
-                    Continue your learning roadmap
-                  </strong>
-
-                  <p>
-                    Follow a structured learning path
-                    based on your target career.
-                  </p>
-                </div>
-
-                <ChevronRight size={17} />
-
-              </div>
-
-            </div>
-
+            <button
+              type="button"
+              className="dashboard-primary-button"
+              onClick={() => navigate("/assessment")}
+            >
+              Retake Assessment
+              <ArrowRight size={17} />
+            </button>
           </div>
-
         </section>
 
-
-        {/* ROADMAP */}
-        <section className="roadmap-section">
-
-          <div className="roadmap-heading">
-
+        <section className="dashboard-next">
+          <div className="dashboard-next-header">
             <div>
-              <span className="panel-kicker">
-                YOUR JOURNEY
-              </span>
+              <div className="dashboard-kicker">
+                <span />
+                WHAT'S NEXT
+              </div>
 
-              <h2>Career roadmap</h2>
+              <h2>
+                Build your career
+                <br />
+                <span>step by step.</span>
+              </h2>
             </div>
-
-            <span className="roadmap-label">
-              01 / 04
-            </span>
-
           </div>
 
-
-          <div className="roadmap">
-
-            <div className="roadmap-item active">
-
-              <div className="roadmap-icon">
-                <CheckCircle2 size={18} />
+          <div className="dashboard-actions">
+            <button
+              type="button"
+              className="dashboard-action-card"
+              onClick={() => navigate("/assessment")}
+            >
+              <div className="dashboard-action-icon">
+                <Brain size={22} />
               </div>
 
               <div>
-                <span>STEP 01</span>
-                <strong>Skill Assessment</strong>
-                <p>Completed</p>
+                <strong>Improve your score</strong>
+                <p>Retake the assessment and track your progress.</p>
               </div>
 
-            </div>
+              <ArrowRight size={18} />
+            </button>
 
-
-            <div className="roadmap-line" />
-
-
-            <div className="roadmap-item">
-
-              <div className="roadmap-icon">
-                <GraduationCap size={18} />
-              </div>
-
-              <div>
-                <span>STEP 02</span>
-                <strong>Learning Roadmap</strong>
-                <p>Recommended next</p>
-              </div>
-
-            </div>
-
-
-            <div className="roadmap-line" />
-
-
-            <div className="roadmap-item">
-
-              <div className="roadmap-icon">
-                <Target size={18} />
+            <button
+              type="button"
+              className="dashboard-action-card"
+              onClick={() => navigate("/career-selection")}
+            >
+              <div className="dashboard-action-icon">
+                <Target size={22} />
               </div>
 
               <div>
-                <span>STEP 03</span>
-                <strong>Projects</strong>
-                <p>Build your portfolio</p>
+                <strong>Explore another career</strong>
+                <p>Discover a different career path.</p>
               </div>
 
-            </div>
-
-
-            <div className="roadmap-line" />
-
-
-            <div className="roadmap-item">
-
-              <div className="roadmap-icon">
-                <Award size={18} />
-              </div>
-
-              <div>
-                <span>STEP 04</span>
-                <strong>Career Ready</strong>
-                <p>Track your progress</p>
-              </div>
-
-            </div>
-
+              <ArrowRight size={18} />
+            </button>
           </div>
-
         </section>
 
-      </main>
-
+        <footer className="dashboard-footer">
+          <span>CAREERPATH AI</span>
+          <span>Your journey. Your skills. Your future.</span>
+        </footer>
+      </div>
     </div>
   );
 }
