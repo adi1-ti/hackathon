@@ -12,7 +12,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
-import "./CareerSelection.css";
+import "../App.css";
 
 const careers = [
   {

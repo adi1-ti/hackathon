@@ -108,50 +108,51 @@ function StudentProfile() {
   // ==========================================
 
   const handleContinue = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (selectedInterests.length === 0) {
-      alert("Please select at least one area of interest.");
+  try {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      alert("Please login again.");
+      navigate("/login");
       return;
     }
 
-    try {
-      setSaving(true);
-
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
-
-      if (authError || !user) {
-        alert("Please log in again.");
-        navigate("/login");
-        return;
-      }
-
-      const { error } = await supabase
-        .from("students")
-        .update({
+    const { error } = await supabase
+      .from("students")
+      .upsert(
+        {
+          auth_id: user.id,
+          name: formData.name,
+          education: formData.education,
+          institution: formData.university,
+          year_of_study: formData.semester,
+          email: user.email,
           interests: selectedInterests,
-        })
-        .eq("id", user.id);
+        },
+        {
+          onConflict: "auth_id",
+        }
+      );
 
-      if (error) {
-        console.error("Profile save error:", error);
-        alert(error.message);
-        return;
-      }
-
-      console.log("PROFILE SAVED");
-
-      navigate("/career-selection");
-    } catch (error) {
-      console.error("Save error:", error);
-      alert("Unable to save your profile.");
-    } finally {
-      setSaving(false);
+    if (error) {
+      console.error("PROFILE SAVE ERROR:", error);
+      alert(error.message);
+      return;
     }
-  };
+
+    console.log("PROFILE SAVED SUCCESSFULLY");
+
+    navigate("/career-selection");
+  } catch (error) {
+    console.error("PROFILE ERROR:", error);
+    alert("Something went wrong while saving your profile.");
+  }
+};
 
   // ==========================================
   // LOADING SCREEN
