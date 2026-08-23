@@ -196,9 +196,101 @@ app.get("/api/assessments/:career", async (req, res) => {
 });
 
 // ==========================================
-// START SERVER
+// REGISTER USER
 // ==========================================
 
+app.post("/api/auth/register", async (req, res) => {
+  try {
+    const {
+      name,
+      institution,
+      education,
+      yearOfStudy,
+      email,
+      password,
+    } = req.body;
+
+    if (
+      !name ||
+      !institution ||
+      !education ||
+      !yearOfStudy ||
+      !email ||
+      !password
+    ) {
+      return res.status(400).json({
+        error: "All fields are required.",
+      });
+    }
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name,
+          institution,
+          education,
+          yearOfStudy,
+        },
+      },
+    });
+
+    if (error) {
+      return res.status(400).json({
+        error: error.message,
+      });
+    }
+
+    res.status(201).json({
+      message: "Account created successfully.",
+      user: data.user,
+      session: data.session,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+});
+
+// ==========================================
+// LOGIN USER
+// ==========================================
+
+app.post("/api/auth/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        error: "Email and password are required.",
+      });
+    }
+
+    const { data, error } =
+      await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+    if (error) {
+      return res.status(401).json({
+        error: error.message,
+      });
+    }
+
+    res.json({
+      message: "Login successful.",
+      user: data.user,
+      session: data.session,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+});
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, "0.0.0.0", () => {
