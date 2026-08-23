@@ -4,46 +4,130 @@ import { supabase } from "../supabaseClient";
 
 import {
   ArrowRight,
-  GraduationCap,
-  UserRound,
-  Building2,
   Sparkles,
   Check,
+  Code2,
+  Server,
+  Database,
+  BrainCircuit,
+  ShieldCheck,
+  Palette,
 } from "lucide-react";
+
+import "./StudentProfile.css";
+
+const interestCategories = [
+  {
+    id: "frontend",
+    title: "Frontend Development",
+    description: "Build websites and interactive user interfaces.",
+    icon: Code2,
+    skills: [
+      "HTML & Web Semantics",
+      "CSS, Layout & Responsive Design",
+      "JavaScript",
+      "React & Component Development",
+      "APIs & Data Integration",
+      "Testing, Debugging & Version Control",
+    ],
+  },
+
+  {
+    id: "backend",
+    title: "Backend Development",
+    description: "Build servers, APIs, databases and backend systems.",
+    icon: Server,
+    skills: [
+      "Programming Fundamentals",
+      "Backend Framework & Server Development",
+      "API Development",
+      "Databases & SQL",
+      "SQL & Database Querying",
+      "Authentication, Authorization & Security",
+      "Testing, Debugging & Version Control",
+    ],
+  },
+
+  {
+    id: "data",
+    title: "Data & Analytics",
+    description: "Work with data to discover insights and patterns.",
+    icon: Database,
+    skills: [
+      "Python for Data Analysis",
+      "Data Cleaning & Processing",
+      "Data Processing & Analysis",
+      "Databases & SQL",
+      "SQL & Database Querying",
+      "Statistics & Data Interpretation",
+      "Data Visualization & Exploration",
+      "Data Visualization & BI Tools",
+      "Excel & Spreadsheet Analysis",
+      "Mathematics, Statistics & Probability",
+    ],
+  },
+
+  {
+    id: "aiml",
+    title: "AI / Machine Learning",
+    description: "Explore machine learning, AI and intelligent systems.",
+    icon: BrainCircuit,
+    skills: [
+      "Python Programming",
+      "Machine Learning Fundamentals",
+      "Deep Learning & Neural Networks",
+      "Model Training & Evaluation",
+      "ML Frameworks & Tools",
+      "Mathematics, Statistics & Probability",
+      "Data Processing & Analysis",
+    ],
+  },
+
+  {
+    id: "cybersecurity",
+    title: "Cybersecurity",
+    description: "Protect systems, networks, applications and data.",
+    icon: ShieldCheck,
+    skills: [
+      "Cybersecurity Fundamentals",
+      "Linux & System Fundamentals",
+      "Networking & Network Security",
+      "Web & Application Security",
+      "Vulnerability Assessment",
+      "Security Monitoring & Incident Response",
+      "Security Scripting & Automation",
+      "Authentication, Authorization & Security",
+    ],
+  },
+
+  {
+    id: "uiux",
+    title: "UI / UX Design",
+    description: "Design useful, accessible and engaging experiences.",
+    icon: Palette,
+    skills: [
+      "UI Design & Visual Principles",
+      "Figma & Prototyping",
+      "Wireframing & Information Architecture",
+      "User Research & Problem Definition",
+      "Usability Testing & UX Evaluation",
+      "Design Communication & Presentation",
+    ],
+  },
+];
 
 function StudentProfile() {
   const navigate = useNavigate();
 
+  const [selectedInterests, setSelectedInterests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const [student, setStudent] = useState({
-    name: "",
-    education: "",
-    institution: "",
-    yearOfStudy: "",
-  });
-
-  const [selectedInterests, setSelectedInterests] = useState([]);
-
-  const interests = [
-    "Web Development",
-    "Cybersecurity",
-    "Artificial Intelligence",
-    "Data & Analytics",
-    "Cloud Computing",
-    "Design & User Experience",
-  ];
-
-  // ==========================================
-  // LOAD LOGGED-IN USER
-  // ==========================================
-
   useEffect(() => {
-    loadStudentProfile();
+    loadInterests();
   }, []);
 
-  const loadStudentProfile = async () => {
+  const loadInterests = async () => {
     try {
       setLoading(true);
 
@@ -53,416 +137,220 @@ function StudentProfile() {
       } = await supabase.auth.getUser();
 
       if (authError || !user) {
-        console.error("No logged-in user:", authError);
         navigate("/login");
         return;
       }
 
-      console.log("LOGGED IN USER:", user);
-
-      // Get student information from your students table
       const { data, error } = await supabase
         .from("students")
-        .select("*")
-        .eq("id", user.id)
+        .select("interests")
+        .eq("auth_id", user.id)
         .single();
 
       if (error) {
-        console.error("Student profile error:", error);
+        console.error("Could not load interests:", error);
         return;
       }
 
-      console.log("STUDENT PROFILE:", data);
-
-      setStudent({
-        name: data.name || "",
-        education: data.education || "",
-        institution: data.institution || "",
-        yearOfStudy: data.year_of_study || "",
-      });
-
-      if (data.interests) {
+      if (Array.isArray(data?.interests)) {
         setSelectedInterests(data.interests);
       }
     } catch (error) {
-      console.error("Profile loading error:", error);
+      console.error("Interest loading error:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  // ==========================================
-  // SELECT / UNSELECT INTEREST
-  // ==========================================
+  const toggleInterest = (skill) => {
+    setSelectedInterests((current) => {
+      if (current.includes(skill)) {
+        return current.filter((item) => item !== skill);
+      }
 
-  const toggleInterest = (interest) => {
-    setSelectedInterests((prev) =>
-      prev.includes(interest)
-        ? prev.filter((item) => item !== interest)
-        : [...prev, interest]
-    );
+      return [...current, skill];
+    });
   };
 
-  // ==========================================
-  // SAVE PROFILE
-  // ==========================================
+  const handleContinue = async (event) => {
+    event.preventDefault();
 
-  const handleContinue = async (e) => {
-  e.preventDefault();
-
-  try {
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-
-    if (userError || !user) {
-      alert("Please login again.");
-      navigate("/login");
+    if (selectedInterests.length === 0) {
+      alert("Please select at least one area of interest.");
       return;
     }
 
-    const { error } = await supabase
-      .from("students")
-      .upsert(
-        {
-          auth_id: user.id,
-          name: formData.name,
-          education: formData.education,
-          institution: formData.university,
-          year_of_study: formData.semester,
-          email: user.email,
+    try {
+      setSaving(true);
+
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+
+      if (authError || !user) {
+        alert("Your session has expired. Please login again.");
+        navigate("/login");
+        return;
+      }
+
+      const { error } = await supabase
+        .from("students")
+        .update({
           interests: selectedInterests,
-        },
-        {
-          onConflict: "auth_id",
-        }
-      );
+        })
+        .eq("auth_id", user.id);
 
-    if (error) {
-      console.error("PROFILE SAVE ERROR:", error);
-      alert(error.message);
-      return;
+      if (error) {
+        console.error("INTEREST SAVE ERROR:", error);
+        alert(error.message);
+        return;
+      }
+
+      console.log("INTERESTS SAVED:", selectedInterests);
+
+      navigate("/career-selection");
+    } catch (error) {
+      console.error("PROFILE ERROR:", error);
+      alert("Something went wrong while saving your interests.");
+    } finally {
+      setSaving(false);
     }
-
-    console.log("PROFILE SAVED SUCCESSFULLY");
-
-    navigate("/career-selection");
-  } catch (error) {
-    console.error("PROFILE ERROR:", error);
-    alert("Something went wrong while saving your profile.");
-  }
-};
-
-  // ==========================================
-  // LOADING SCREEN
-  // ==========================================
+  };
 
   if (loading) {
     return (
-      <div className="profile-page">
-        <div
-          style={{
-            minHeight: "100vh",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <p>Loading your profile...</p>
+      <div className="student-interest-page">
+        <div className="student-interest-loading">
+          <Sparkles size={22} />
+          <p>Preparing your interest profile...</p>
         </div>
       </div>
     );
   }
 
-  // ==========================================
-  // PAGE
-  // ==========================================
-
   return (
-    <div className="profile-page">
+    <div className="student-interest-page">
+      <div className="student-interest-container">
 
-      {/* HEADER */}
+        {/* HEADER */}
 
-      <header className="profile-header">
+        <header className="student-interest-header">
+          <Link to="/" className="auth-brand">
+            <div className="brand-mark">
+              <Sparkles size={18} />
+            </div>
 
-        <Link to="/" className="auth-brand">
+            <div>
+              <span className="brand-name">CAREERPATH</span>
+              <span className="brand-subtitle">AI</span>
+            </div>
+          </Link>
 
-          <div className="brand-mark">
-            <Sparkles size={18} />
+          <div className="interest-progress">
+            PROFILE SETUP <span>01 / 03</span>
+          </div>
+        </header>
+
+        {/* INTRO */}
+
+        <section className="student-interest-intro">
+          <div className="student-interest-kicker">
+            <span />
+            YOUR INTERESTS
           </div>
 
-          <div>
-            <span className="brand-name">CAREERPATH</span>
-            <span className="brand-subtitle">AI</span>
-          </div>
+          <h1>
+            What do you want
+            <br />
+            to <span>explore?</span>
+          </h1>
 
-        </Link>
+          <p>
+            Select the technologies and skills that interest you.
+            We'll use them to understand which career paths may suit you.
+          </p>
 
-        <div className="profile-progress-text">
-          PROFILE SETUP <span>01 / 03</span>
-        </div>
-
-      </header>
-
-
-      {/* MAIN */}
-
-      <main className="profile-main">
-
-        {/* SIDEBAR */}
-
-        <aside className="profile-sidebar">
-
-          <div className="sidebar-title">
-
-            <span className="sidebar-kicker">
-              YOUR JOURNEY
+          <div className="selection-counter">
+            <strong>{selectedInterests.length}</strong>
+            <span>
+              {selectedInterests.length === 1 ? "skill" : "skills"} selected
             </span>
+          </div>
+        </section>
 
-            <h2>
-              Let's understand
-              <br />
-              <span>you first.</span>
-            </h2>
+        {/* INTEREST CATEGORIES */}
 
-            <p>
-              We've already collected your basic information.
-              Now tell us what areas you're interested in.
-            </p>
+        <form onSubmit={handleContinue}>
+          <div className="interest-category-grid">
+
+            {interestCategories.map((category) => {
+              const Icon = category.icon;
+
+              return (
+                <section
+                  className="interest-category-card"
+                  key={category.id}
+                >
+                  <div className="interest-category-header">
+                    <div className="interest-category-icon">
+                      <Icon size={20} />
+                    </div>
+
+                    <div>
+                      <h2>{category.title}</h2>
+                      <p>{category.description}</p>
+                    </div>
+                  </div>
+
+                  <div className="interest-skill-grid">
+                    {category.skills.map((skill) => {
+                      const selected = selectedInterests.includes(skill);
+
+                      return (
+                        <button
+                          type="button"
+                          key={skill}
+                          className={`interest-skill ${
+                            selected ? "selected" : ""
+                          }`}
+                          onClick={() => toggleInterest(skill)}
+                        >
+                          <span>{skill}</span>
+
+                          <span className="interest-check">
+                            {selected && <Check size={13} />}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </section>
+              );
+            })}
 
           </div>
 
+          {/* BOTTOM ACTION */}
 
-          <div className="setup-steps">
-
-            <div className="setup-step active">
-
-              <div className="step-icon">
-                <UserRound size={17} />
-              </div>
-
-              <div>
-                <small>STEP 01</small>
-                <strong>About You</strong>
-              </div>
-
+          <div className="student-interest-footer">
+            <div>
+              <span className="footer-label">NEXT</span>
+              <strong>Find careers that match your interests</strong>
             </div>
-
-
-            <div className="setup-line" />
-
-
-            <div className="setup-step">
-
-              <div className="step-icon">
-                <Sparkles size={17} />
-              </div>
-
-              <div>
-                <small>STEP 02</small>
-                <strong>Interests</strong>
-              </div>
-
-            </div>
-
-
-            <div className="setup-line" />
-
-
-            <div className="setup-step">
-
-              <div className="step-icon">
-                <GraduationCap size={17} />
-              </div>
-
-              <div>
-                <small>STEP 03</small>
-                <strong>Career Goals</strong>
-              </div>
-
-            </div>
-
-          </div>
-
-        </aside>
-
-
-        {/* FORM */}
-
-        <section className="profile-form-section">
-
-          <div className="form-heading">
-
-            <div className="profile-kicker">
-              <span />
-              YOUR PROFILE
-            </div>
-
-            <h1>
-              Let's understand
-              <br />
-              <span>you better.</span>
-            </h1>
-
-            <p>
-              We've already saved your basic information.
-              Review it below and choose the areas you're
-              interested in.
-            </p>
-
-          </div>
-
-
-          {/* STUDENT INFORMATION */}
-
-          <div className="profile-summary">
-
-            <div className="profile-summary-item">
-
-              <UserRound size={17} />
-
-              <div>
-                <small>FULL NAME</small>
-                <strong>{student.name || "Not provided"}</strong>
-              </div>
-
-            </div>
-
-
-            <div className="profile-summary-item">
-
-              <GraduationCap size={17} />
-
-              <div>
-                <small>EDUCATION</small>
-                <strong>{student.education || "Not provided"}</strong>
-              </div>
-
-            </div>
-
-
-            <div className="profile-summary-item">
-
-              <Building2 size={17} />
-
-              <div>
-                <small>INSTITUTION</small>
-                <strong>
-                  {student.institution || "Not provided"}
-                </strong>
-              </div>
-
-            </div>
-
-
-            <div className="profile-summary-item">
-
-              <GraduationCap size={17} />
-
-              <div>
-                <small>YEAR OF STUDY</small>
-                <strong>
-                  {student.yearOfStudy || "Not provided"}
-                </strong>
-              </div>
-
-            </div>
-
-          </div>
-
-
-          {/* INTERESTS */}
-
-          <form
-            className="profile-form"
-            onSubmit={handleContinue}
-          >
-
-            <div className="interest-section">
-
-              <div className="interest-heading">
-
-                <div>
-
-                  <label>
-                    Areas You're Interested In
-                  </label>
-
-                  <p>
-                    Select all areas that interest you.
-                  </p>
-
-                </div>
-
-                <span>
-                  {selectedInterests.length} selected
-                </span>
-
-              </div>
-
-
-              <div className="interest-grid">
-
-                {interests.map((interest) => {
-
-                  const selected =
-                    selectedInterests.includes(interest);
-
-                  return (
-
-                    <button
-                      type="button"
-                      key={interest}
-                      className={`interest-chip ${
-                        selected ? "selected" : ""
-                      }`}
-                      onClick={() =>
-                        toggleInterest(interest)
-                      }
-                    >
-
-                      <span>{interest}</span>
-
-                      {selected && (
-                        <Check size={15} />
-                      )}
-
-                    </button>
-
-                  );
-
-                })}
-
-              </div>
-
-            </div>
-
-
-            {/* CONTINUE */}
 
             <button
               type="submit"
-              className="profile-continue"
-              disabled={saving}
+              className="student-interest-button"
+              disabled={saving || selectedInterests.length === 0}
             >
-
-              {saving
-                ? "Saving..."
-                : "Continue to Career Selection"}
-
-              {!saving && (
-                <ArrowRight size={17} />
-              )}
-
+              {saving ? "Saving..." : "Continue"}
+              {!saving && <ArrowRight size={17} />}
             </button>
+          </div>
+        </form>
 
-          </form>
-
-        </section>
-
-      </main>
-
+      </div>
     </div>
   );
 }
