@@ -97,7 +97,6 @@ function Home() {
 
             <Link to="/register" className="nav-cta">
               Get Started
-              <ArrowRight size={15} />
             </Link>
           </div>
 

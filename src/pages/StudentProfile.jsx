@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "../supabaseClient";
+
 import {
   ArrowRight,
   GraduationCap,
@@ -15,8 +17,8 @@ function StudentProfile() {
   const navigate = useNavigate();
 
   /* =========================================
-     PROFILE FORM DATA
-     ========================================= */
+     PROFILE DATA
+  ========================================= */
 
   const [formData, setFormData] = useState({
     name: "",
@@ -26,11 +28,14 @@ function StudentProfile() {
     email: "",
   });
 
+  const [selectedInterests, setSelectedInterests] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
   /* =========================================
      INTERESTS
-     ========================================= */
-
-  const [selectedInterests, setSelectedInterests] = useState([]);
+  ========================================= */
 
   const interests = [
     "Web Development",
@@ -42,8 +47,62 @@ function StudentProfile() {
   ];
 
   /* =========================================
+     LOAD LOGGED-IN STUDENT
+  ========================================= */
+
+  useEffect(() => {
+    loadStudentProfile();
+  }, []);
+
+  const loadStudentProfile = async () => {
+    try {
+      setLoading(true);
+
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+
+      if (authError || !user) {
+        console.error("No logged-in user:", authError);
+        navigate("/login");
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("students")
+        .select(
+          "id, auth_id, name, institution, education, year_of_study, email, interests"
+        )
+        .eq("auth_id", user.id)
+        .single();
+
+      if (error) {
+        console.error("Student profile error:", error);
+        return;
+      }
+
+      setFormData({
+        name: data.name || "",
+        education: data.education || "",
+        institution: data.institution || "",
+        yearOfStudy: data.year_of_study || "",
+        email: data.email || user.email || "",
+      });
+
+      setSelectedInterests(
+        Array.isArray(data.interests) ? data.interests : []
+      );
+    } catch (error) {
+      console.error("Profile loading error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* =========================================
      HANDLE PROFILE INPUTS
-     ========================================= */
+  ========================================= */
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -55,8 +114,8 @@ function StudentProfile() {
   };
 
   /* =========================================
-     HANDLE INTEREST SELECTION
-     ========================================= */
+     TOGGLE INTEREST
+  ========================================= */
 
   const toggleInterest = (interest) => {
     setSelectedInterests((prev) =>
@@ -67,24 +126,82 @@ function StudentProfile() {
   };
 
   /* =========================================
-     CONTINUE
-     ========================================= */
+     SAVE PROFILE + CONTINUE
+  ========================================= */
 
-  const handleContinue = (e) => {
+  const handleContinue = async (e) => {
     e.preventDefault();
 
-    // Frontend only for now.
-    // Your teammate can connect formData and
-    // selectedInterests to Supabase later.
+    try {
+      setSaving(true);
 
-    navigate("/career-selection");
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        alert("Please login again.");
+        navigate("/login");
+        return;
+      }
+
+      const { error } = await supabase
+        .from("students")
+        .upsert(
+          {
+            auth_id: user.id,
+            name: formData.name.trim(),
+            education: formData.education,
+            institution: formData.institution.trim(),
+            year_of_study: formData.yearOfStudy,
+            email: formData.email.trim() || user.email || "",
+            interests: selectedInterests,
+          },
+          {
+            onConflict: "auth_id",
+          }
+        );
+
+      if (error) {
+        console.error("PROFILE SAVE ERROR:", error);
+        alert(error.message);
+        return;
+      }
+
+      console.log("PROFILE SAVED SUCCESSFULLY");
+
+      navigate("/career-selection");
+    } catch (error) {
+      console.error("PROFILE ERROR:", error);
+      alert("Something went wrong while saving your profile.");
+    } finally {
+      setSaving(false);
+    }
   };
+
+  /* =========================================
+     LOADING SCREEN
+  ========================================= */
+
+  if (loading) {
+    return (
+      <div className="profile-page">
+        <div className="profile-loading">
+          <Sparkles size={28} />
+          <p>Loading your profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  /* =========================================
+     PAGE
+  ========================================= */
 
   return (
     <div className="profile-page">
-      {/* =========================================
-          HEADER
-      ========================================== */}
+      {/* HEADER */}
 
       <header className="profile-header">
         <Link to="/" className="auth-brand">
@@ -103,14 +220,10 @@ function StudentProfile() {
         </div>
       </header>
 
-      {/* =========================================
-          MAIN
-      ========================================== */}
+      {/* MAIN */}
 
       <main className="profile-main">
-        {/* =======================================
-            LEFT SIDEBAR
-        ======================================== */}
+        {/* SIDEBAR */}
 
         <aside className="profile-sidebar">
           <div className="sidebar-title">
@@ -123,12 +236,10 @@ function StudentProfile() {
             </h2>
 
             <p>
-              Your profile helps CareerPath AI understand your starting
-              point and create a more relevant career journey for you.
+              We've already saved your basic information. Review it below
+              and choose the areas you're interested in.
             </p>
           </div>
-
-          {/* JOURNEY STEPS */}
 
           <div className="setup-steps">
             {/* STEP 01 */}
@@ -176,14 +287,10 @@ function StudentProfile() {
           </div>
         </aside>
 
-        {/* =======================================
-            RIGHT CONTENT
-        ======================================== */}
+        {/* CONTENT */}
 
         <section className="profile-form-section">
-          {/* =====================================
-              PAGE HEADING
-          ====================================== */}
+          {/* PAGE HEADING */}
 
           <div className="form-heading">
             <div className="profile-kicker">
@@ -192,28 +299,26 @@ function StudentProfile() {
             </div>
 
             <h1>
-              Tell us a little more 
+              Let's understand
               <br />
-              <span>about yourself.</span>
+              <span>you better.</span>
             </h1>
 
             <p>
-              Tell us a little more about yourself and choose the areas
-              you're interested in.
+              We've already saved your basic information. Review it below
+              and choose the areas you're interested in.
             </p>
           </div>
 
-          {/* =====================================
-              PROFILE FORM
-          ====================================== */}
+          {/* FORM */}
 
           <form
             className="profile-form"
             onSubmit={handleContinue}
           >
-            {/* ===================================
-                PROFILE DETAILS CARD
-            ==================================== */}
+            {/* =====================================
+                BASIC INFORMATION
+            ====================================== */}
 
             <section className="profile-review-card">
               <div className="profile-review-header">
@@ -225,8 +330,7 @@ function StudentProfile() {
                   <h2>Your profile details</h2>
 
                   <p className="review-description">
-                    Fill in your details so CareerPath AI can understand
-                    your current academic background.
+                    Review and update your information before continuing.
                   </p>
                 </div>
 
@@ -254,7 +358,7 @@ function StudentProfile() {
                       type="text"
                       value={formData.name}
                       onChange={handleChange}
-                      placeholder="Enter your full name"
+                      placeholder="Not provided"
                     />
                   </div>
                 </div>
@@ -278,7 +382,7 @@ function StudentProfile() {
                       onChange={handleChange}
                     >
                       <option value="">
-                        Select your education level
+                        Not provided
                       </option>
 
                       <option value="Class 11">
@@ -362,7 +466,7 @@ function StudentProfile() {
                       type="text"
                       value={formData.institution}
                       onChange={handleChange}
-                      placeholder="Enter your institution"
+                      placeholder="Not provided"
                     />
                   </div>
                 </div>
@@ -386,7 +490,7 @@ function StudentProfile() {
                       onChange={handleChange}
                     >
                       <option value="">
-                        Enter your year of study
+                        Not provided
                       </option>
 
                       <option value="1st Year">
@@ -434,16 +538,16 @@ function StudentProfile() {
                       type="email"
                       value={formData.email}
                       onChange={handleChange}
-                      placeholder="Enter your email"
+                      placeholder="Not provided"
                     />
                   </div>
                 </div>
               </div>
             </section>
 
-            {/* ===================================
-                INTERESTS CARD
-            ==================================== */}
+            {/* =====================================
+                INTERESTS
+            ====================================== */}
 
             <section className="profile-review-card interests-card">
               <div className="profile-review-header">
@@ -482,25 +586,25 @@ function StudentProfile() {
                     >
                       <span>{interest}</span>
 
-                      {selected && (
-                        <Check size={15} />
-                      )}
+                      {selected && <Check size={15} />}
                     </button>
                   );
                 })}
               </div>
             </section>
 
-            {/* ===================================
-                CONTINUE BUTTON
-            ==================================== */}
+            {/* CONTINUE */}
 
             <button
               type="submit"
               className="profile-continue"
+              disabled={saving}
             >
-              Continue to Career Selection
-              <ArrowRight size={17} />
+              {saving
+                ? "Saving..."
+                : "Continue to Career Selection"}
+
+              {!saving && <ArrowRight size={17} />}
             </button>
           </form>
         </section>

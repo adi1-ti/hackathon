@@ -1,3 +1,4 @@
+import { supabase } from "../supabaseClient";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import {
@@ -17,7 +18,8 @@ import {
 function Login() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   return (
     <div className="auth-page">
 
@@ -53,7 +55,35 @@ function Login() {
             recommendations, and skill roadmap.
           </p>
 
-          <form className="login-form">
+          <form
+            className="login-form"
+            onSubmit={async (e) => {
+  e.preventDefault();
+
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      console.error("LOGIN ERROR:", error);
+      alert(error.message);
+      return;
+    }
+
+    console.log("LOGIN SUCCESSFUL:", data);
+
+    alert("Login successful!");
+
+    navigate("/career-selection");
+
+  } catch (error) {
+    console.error("LOGIN ERROR:", error);
+    alert("Something went wrong.");
+  }
+}}
+          >
 
             {/* EMAIL */}
             <div className="input-group">
@@ -66,6 +96,8 @@ function Login() {
                   id="email"
                   type="email"
                   placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
             </div>
@@ -81,6 +113,8 @@ function Login() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
 
                 <button
@@ -115,17 +149,10 @@ function Login() {
             </div>
 
             {/* LOGIN BUTTON */}
-            <button
-  type="button"
-  className="auth-button"
-  onClick={() => {
-    console.log("LOGIN CLICKED");
-    navigate("/student-profile");
-  }}
->
-  Log In
-  <ArrowRight size={17} />
-</button>
+            <button type="submit" className="auth-button">
+              Log In
+              <ArrowRight size={17} />
+            </button>
 
           </form>
 
