@@ -9,7 +9,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { supabase } from "../supabaseClient";
-import "./Assessment.css";
+import "./assessment.css";
 
 function Assessment() {
   const navigate = useNavigate();
