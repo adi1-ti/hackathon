@@ -10,6 +10,10 @@ import {
   Sparkles,
   Target,
   TrendingUp,
+  AlertTriangle,
+  BookOpen,
+  Rocket,
+  Lightbulb,
 } from "lucide-react";
 import { supabase } from "../supabaseClient";
 import "./Dashboard.css";
@@ -66,8 +70,20 @@ function Dashboard() {
           .maybeSingle();
 
       if (assessmentError) throw assessmentError;
+      console.log("LATEST ASSESSMENT FROM DATABASE:", assessmentData);
+console.log(
+  "FULL AI ANALYSIS FROM DATABASE:",
+  JSON.stringify(assessmentData?.ai_analysis, null, 2)
+);
+      const finalAssessment = {
+  ...assessmentData,
+  ai_analysis:
+    typeof assessmentData?.ai_analysis === "string"
+      ? JSON.parse(assessmentData.ai_analysis)
+      : assessmentData?.ai_analysis || {},
+};
 
-      setAssessment(assessmentData);
+setAssessment(finalAssessment);
     } catch (err) {
       console.error("Dashboard loading error:", err);
       setError(err.message || "Unable to load your dashboard.");
@@ -141,13 +157,96 @@ function Dashboard() {
 
   const percentage =
     assessment?.percentage ?? student?.assessment_percentage ?? 0;
+  
+  
 
-  const performance = getPerformanceLabel(percentage);
-  const performanceMessage = getPerformanceMessage(percentage);
+  /*
+   * AI ANALYSIS
+   *
+   * Stored inside:
+   * assessment_results.ai_analysis
+   */
+
+  // ===============================
+// AI ANALYSIS
+// ===============================
+
+let aiAnalysis = {};
+
+try {
+  if (assessment?.ai_analysis) {
+    if (typeof assessment.ai_analysis === "string") {
+      aiAnalysis = JSON.parse(assessment.ai_analysis);
+    } else {
+      aiAnalysis = assessment.ai_analysis;
+    }
+  }
+} catch (err) {
+  console.error("Could not parse AI analysis:", err);
+  aiAnalysis = {};
+}
+
+console.log("DASHBOARD AI ANALYSIS:", aiAnalysis);
+console.log("OVERALL LEVEL:", aiAnalysis.overall_level);
+console.log("PERFORMANCE:", aiAnalysis.performance_analysis);
+console.log("STRENGTHS:", aiAnalysis.strengths);
+console.log("WEAKNESSES:", aiAnalysis.weaknesses);
+console.log("SKILL GAPS:", aiAnalysis.skill_gaps);
+console.log("RECOMMENDATIONS:", aiAnalysis.recommendations);
+console.log("ROADMAP:", aiAnalysis.roadmap);
+console.log("PROJECTS:", aiAnalysis.projects);
+
+// Skill Profile
+const skillProfile = Array.isArray(aiAnalysis.skill_profile)
+  ? aiAnalysis.skill_profile
+  : [];
+
+// Strengths
+const strengths = Array.isArray(aiAnalysis.strengths)
+  ? aiAnalysis.strengths
+  : [];
+
+// Weaknesses
+const weaknesses = Array.isArray(aiAnalysis.weaknesses)
+  ? aiAnalysis.weaknesses
+  : [];
+
+// Skill Gaps
+const skillGaps = Array.isArray(aiAnalysis.skill_gaps)
+  ? aiAnalysis.skill_gaps
+  : [];
+
+// Recommendations
+const recommendations = Array.isArray(aiAnalysis.recommendations)
+  ? aiAnalysis.recommendations
+  : [];
+
+// Roadmap
+const roadmap = Array.isArray(aiAnalysis.roadmap)
+  ? aiAnalysis.roadmap
+  : [];
+
+// Projects
+const projects = Array.isArray(aiAnalysis.projects)
+  ? aiAnalysis.projects
+  : [];
+
+// Overall Level
+const overallLevel =
+  aiAnalysis.overall_level ||
+  getPerformanceLabel(percentage);
+
+// Performance Analysis
+const performanceAnalysis =
+  aiAnalysis.performance_analysis ||
+  getPerformanceMessage(percentage);
 
   return (
     <div className="dashboard-page">
       <div className="dashboard-container">
+
+        {/* HEADER */}
+
         <header className="dashboard-header">
           <button
             type="button"
@@ -163,7 +262,9 @@ function Dashboard() {
           </div>
 
           <div className="dashboard-header-actions">
-            <span className="dashboard-user">{user?.email}</span>
+            <span className="dashboard-user">
+              {user?.email}
+            </span>
 
             <button
               type="button"
@@ -175,6 +276,8 @@ function Dashboard() {
             </button>
           </div>
         </header>
+
+        {/* HERO */}
 
         <section className="dashboard-hero">
           <div>
@@ -190,8 +293,8 @@ function Dashboard() {
             </h1>
 
             <p>
-              Here's a snapshot of your current skill level and assessment
-              performance.
+              Here's a snapshot of your current skill level,
+              assessment performance and personalized AI career plan.
             </p>
           </div>
 
@@ -200,7 +303,10 @@ function Dashboard() {
           </div>
         </section>
 
+        {/* STATS */}
+
         <section className="dashboard-stats">
+
           <div className="dashboard-stat-card">
             <div className="dashboard-stat-icon">
               <Target size={21} />
@@ -235,10 +341,26 @@ function Dashboard() {
               <strong>{percentage}%</strong>
             </div>
           </div>
+
+          <div className="dashboard-stat-card">
+            <div className="dashboard-stat-icon">
+              <Brain size={21} />
+            </div>
+
+            <div>
+              <span>AI LEVEL</span>
+              <strong>{overallLevel}</strong>
+            </div>
+          </div>
+
         </section>
 
+        {/* SCORE + CAREER */}
+
         <section className="dashboard-result-grid">
+
           <div className="dashboard-score-card">
+
             <div className="dashboard-card-heading">
               <div>
                 <span>ASSESSMENT RESULT</span>
@@ -249,6 +371,7 @@ function Dashboard() {
             </div>
 
             <div className="dashboard-score">
+
               <div
                 className="dashboard-score-circle"
                 style={{
@@ -262,16 +385,21 @@ function Dashboard() {
               </div>
 
               <div className="dashboard-performance">
+
                 <span className="dashboard-performance-label">
-                  {performance}
+                  {overallLevel}
                 </span>
 
-                <p>{performanceMessage}</p>
+                <p>{performanceAnalysis}</p>
+
               </div>
+
             </div>
+
           </div>
 
           <div className="dashboard-career-card">
+
             <div className="dashboard-card-heading">
               <div>
                 <span>CAREER PATH</span>
@@ -282,8 +410,8 @@ function Dashboard() {
             </div>
 
             <p>
-              Your assessment has been evaluated based on the skills associated
-              with your selected career.
+              Your AI career mentor has analyzed your assessment
+              and identified the skills you should focus on next.
             </p>
 
             <button
@@ -294,12 +422,492 @@ function Dashboard() {
               Retake Assessment
               <ArrowRight size={17} />
             </button>
+
           </div>
+
         </section>
 
-        <section className="dashboard-next">
-          <div className="dashboard-next-header">
+        {/* AI SKILL PROFILE */}
+
+        <section className="dashboard-ai-section">
+
+          <div className="dashboard-section-heading">
+
             <div>
+              <div className="dashboard-kicker">
+                <span />
+                AI SKILL ANALYSIS
+              </div>
+
+              <h2>Your Skill Profile</h2>
+
+              <p>
+                Based on your assessment performance,
+                here's how your current skills compare.
+              </p>
+            </div>
+
+            <Brain size={30} />
+
+          </div>
+
+          {skillProfile.length > 0 ? (
+
+            <div className="dashboard-skill-profile">
+
+              {skillProfile.map((item, index) => {
+
+                const skillPercentage = Math.max(
+                  0,
+                  Math.min(100, Number(item.percentage) || 0)
+                );
+
+                return (
+                  <div
+                    className="dashboard-skill"
+                    key={`${item.skill}-${index}`}
+                  >
+
+                    <div className="dashboard-skill-top">
+
+                      <strong>{item.skill}</strong>
+
+                      <span>
+                        {skillPercentage}%
+                      </span>
+
+                    </div>
+
+                    <div className="dashboard-skill-bar">
+
+                      <div
+                        className="dashboard-skill-progress"
+                        style={{
+                          width: `${skillPercentage}%`,
+                        }}
+                      />
+
+                    </div>
+
+                    <small>
+                      {item.correct ?? 0} of {item.total ?? 0} correct
+                    </small>
+
+                  </div>
+                );
+              })}
+
+            </div>
+
+          ) : (
+
+            <div className="dashboard-empty-ai">
+              <Brain size={25} />
+              <p>
+                Complete an assessment to generate your AI skill profile.
+              </p>
+            </div>
+
+          )}
+
+        </section>
+
+        {/* STRENGTHS + WEAKNESSES */}
+
+        <section className="dashboard-ai-grid">
+
+          <div className="dashboard-ai-card">
+
+            <div className="dashboard-ai-card-heading">
+              <CheckCircle2 size={22} />
+
+              <div>
+                <span>YOUR STRENGTHS</span>
+                <h3>Skills you're doing well in</h3>
+              </div>
+            </div>
+
+            {strengths.length > 0 ? (
+
+              <div className="dashboard-ai-list">
+
+                {strengths.map((item, index) => (
+                  <div
+                    className="dashboard-ai-list-item"
+                    key={index}
+                  >
+                    <strong>{item.skill}</strong>
+
+                    <p>{item.reason}</p>
+                  </div>
+                ))}
+
+              </div>
+
+            ) : (
+
+              <div className="dashboard-empty-ai">
+                <p>
+                  Your AI analysis will identify your strongest skills here.
+                </p>
+              </div>
+
+            )}
+
+          </div>
+
+
+          <div className="dashboard-ai-card">
+
+            <div className="dashboard-ai-card-heading">
+              <AlertTriangle size={22} />
+
+              <div>
+                <span>AREAS TO IMPROVE</span>
+                <h3>Your current weaknesses</h3>
+              </div>
+            </div>
+
+            {weaknesses.length > 0 ? (
+
+              <div className="dashboard-ai-list">
+
+                {weaknesses.map((item, index) => (
+                  <div
+                    className="dashboard-ai-list-item"
+                    key={index}
+                  >
+                    <strong>{item.skill}</strong>
+
+                    <p>{item.reason}</p>
+                  </div>
+                ))}
+
+              </div>
+
+            ) : (
+
+              <div className="dashboard-empty-ai">
+                <p>
+                  No weaknesses identified yet.
+                </p>
+              </div>
+
+            )}
+
+          </div>
+
+        </section>
+
+        {/* SKILL GAPS */}
+
+        <section className="dashboard-ai-section">
+
+          <div className="dashboard-section-heading">
+
+            <div>
+              <div className="dashboard-kicker">
+                <span />
+                SKILL GAPS
+              </div>
+
+              <h2>What you should learn next</h2>
+
+              <p>
+                AI-identified skills that can have the biggest impact
+                on your career progress.
+              </p>
+            </div>
+
+            <Target size={30} />
+
+          </div>
+
+          {skillGaps.length > 0 ? (
+
+            <div className="dashboard-gap-grid">
+
+              {skillGaps.map((gap, index) => (
+
+                <div
+                  className="dashboard-gap-card"
+                  key={index}
+                >
+
+                  <div className="dashboard-gap-top">
+
+                    <strong>{gap.skill}</strong>
+
+                    <span className={`gap-${String(
+                      gap.priority || "medium"
+                    ).toLowerCase()}`}>
+                      {gap.priority || "Medium"}
+                    </span>
+
+                  </div>
+
+                  <p>{gap.reason}</p>
+
+                </div>
+
+              ))}
+
+            </div>
+
+          ) : (
+
+            <div className="dashboard-empty-ai">
+              <p>
+                Your AI skill gaps will appear here after assessment analysis.
+              </p>
+            </div>
+
+          )}
+
+        </section>
+
+        {/* AI RECOMMENDATIONS */}
+
+        <section className="dashboard-ai-section">
+
+          <div className="dashboard-section-heading">
+
+            <div>
+              <div className="dashboard-kicker">
+                <span />
+                AI RECOMMENDATIONS
+              </div>
+
+              <h2>Personalized for you</h2>
+
+              <p>
+                Practical next steps based on your current performance.
+              </p>
+            </div>
+
+            <Lightbulb size={30} />
+
+          </div>
+
+          {recommendations.length > 0 ? (
+
+            <div className="dashboard-recommendations">
+
+              {recommendations.map((recommendation, index) => (
+
+                <div
+                  className="dashboard-recommendation"
+                  key={index}
+                >
+
+                  <div className="dashboard-recommendation-number">
+                    {index + 1}
+                  </div>
+
+                  <p>{recommendation}</p>
+
+                </div>
+
+              ))}
+
+            </div>
+
+          ) : (
+
+            <div className="dashboard-empty-ai">
+              <p>
+                Personalized recommendations will appear here.
+              </p>
+            </div>
+
+          )}
+
+        </section>
+
+        {/* 4 WEEK ROADMAP */}
+
+        <section className="dashboard-ai-section">
+
+          <div className="dashboard-section-heading">
+
+            <div>
+              <div className="dashboard-kicker">
+                <span />
+                PERSONALIZED ROADMAP
+              </div>
+
+              <h2>Your 4-week learning plan</h2>
+
+              <p>
+                A focused learning path generated from your skill gaps.
+              </p>
+            </div>
+
+            <BookOpen size={30} />
+
+          </div>
+
+          {roadmap.length > 0 ? (
+
+            <div className="dashboard-roadmap">
+
+              {roadmap.map((week, index) => (
+
+                <div
+                  className="dashboard-roadmap-week"
+                  key={index}
+                >
+
+                  <div className="dashboard-roadmap-number">
+                    {week.week || index + 1}
+                  </div>
+
+                  <div className="dashboard-roadmap-content">
+
+                    <span>
+                      WEEK {week.week || index + 1}
+                    </span>
+
+                    <h3>
+                      {week.title}
+                    </h3>
+
+                    {Array.isArray(week.tasks) && (
+                      <ul>
+                        {week.tasks.map((task, taskIndex) => (
+                          <li key={taskIndex}>
+                            {task}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+
+                  </div>
+
+                </div>
+
+              ))}
+
+            </div>
+
+          ) : (
+
+            <div className="dashboard-empty-ai">
+              <p>
+                Your personalized 4-week roadmap will appear here.
+              </p>
+            </div>
+
+          )}
+
+        </section>
+
+        {/* PROJECT RECOMMENDATIONS */}
+
+        <section className="dashboard-ai-section">
+
+          <div className="dashboard-section-heading">
+
+            <div>
+              <div className="dashboard-kicker">
+                <span />
+                AI PROJECT LAB
+              </div>
+
+              <h2>Projects you should build</h2>
+
+              <p>
+                Portfolio projects selected according to your current
+                skill level and career goal.
+              </p>
+            </div>
+
+            <Rocket size={30} />
+
+          </div>
+
+          {projects.length > 0 ? (
+
+            <div className="dashboard-project-grid">
+
+              {projects.map((project, index) => (
+
+                <div
+                  className="dashboard-project-card"
+                  key={index}
+                >
+
+                  <div className="dashboard-project-top">
+
+                    <div className="dashboard-project-icon">
+                      <Rocket size={20} />
+                    </div>
+
+                    <span>
+                      {project.difficulty || "Beginner"}
+                    </span>
+
+                  </div>
+
+                  <h3>
+                    {project.title}
+                  </h3>
+
+                  <p>
+                    {project.description}
+                  </p>
+
+                  {Array.isArray(project.skills) &&
+                    project.skills.length > 0 && (
+
+                      <div className="dashboard-project-skills">
+
+                        {project.skills.map((skill, skillIndex) => (
+                          <span key={skillIndex}>
+                            {skill}
+                          </span>
+                        ))}
+
+                      </div>
+
+                    )}
+
+                  <div className="dashboard-project-why">
+
+                    <strong>Why this project?</strong>
+
+                    <p>
+                      {project.why_this_project}
+                    </p>
+
+                  </div>
+
+                </div>
+
+              ))}
+
+            </div>
+
+          ) : (
+
+            <div className="dashboard-empty-ai">
+              <p>
+                Complete your assessment to receive personalized project ideas.
+              </p>
+            </div>
+
+          )}
+
+        </section>
+
+        {/* WHAT'S NEXT */}
+
+        <section className="dashboard-next">
+
+          <div className="dashboard-next-header">
+
+            <div>
+
               <div className="dashboard-kicker">
                 <span />
                 WHAT'S NEXT
@@ -310,25 +918,32 @@ function Dashboard() {
                 <br />
                 <span>step by step.</span>
               </h2>
+
             </div>
+
           </div>
 
           <div className="dashboard-actions">
+
             <button
               type="button"
               className="dashboard-action-card"
               onClick={() => navigate("/assessment")}
             >
+
               <div className="dashboard-action-icon">
                 <Brain size={22} />
               </div>
 
               <div>
                 <strong>Improve your score</strong>
-                <p>Retake the assessment and track your progress.</p>
+                <p>
+                  Retake the assessment and track your progress.
+                </p>
               </div>
 
               <ArrowRight size={18} />
+
             </button>
 
             <button
@@ -336,24 +951,35 @@ function Dashboard() {
               className="dashboard-action-card"
               onClick={() => navigate("/career-selection")}
             >
+
               <div className="dashboard-action-icon">
                 <Target size={22} />
               </div>
 
               <div>
                 <strong>Explore another career</strong>
-                <p>Discover a different career path.</p>
+                <p>
+                  Discover a different career path.
+                </p>
               </div>
 
               <ArrowRight size={18} />
+
             </button>
+
           </div>
+
         </section>
+
+        {/* FOOTER */}
 
         <footer className="dashboard-footer">
           <span>CAREERPATH AI</span>
-          <span>Your journey. Your skills. Your future.</span>
+          <span>
+            Your journey. Your skills. Your future.
+          </span>
         </footer>
+
       </div>
     </div>
   );

@@ -118,7 +118,7 @@ function Register() {
       alert("Account created successfully!");
 
       // Student should now choose career
-      navigate("/login");
+      navigate("/student-profile");
 
     } catch (error) {
       console.error("REGISTRATION ERROR:", error);
