@@ -328,7 +328,7 @@ Potential future improvements include:
 
 ## Hackathon
 
-Built for **[TigmaMinds Acadamy Hackathon]**.
+Built for **TigmaMinds Acadamy Hackathon**.
 
 **Challenge/Theme:** Education & Future Learning — Career & Skill Development
 
@@ -336,13 +336,13 @@ Built for **[TigmaMinds Acadamy Hackathon]**.
 
 ## Team
 
-**Team:** [PHOENIX]
+**Team:** PHOENIX
 
 **Members:**
 
-* [Aditi Agarwal]
-* [Shabnam Sultana]
-* [Pangkita Thakuria]
+* Aditi Agarwal
+* Shabnam Sultana
+* Pangkita Thakuria
 
 ---
 
