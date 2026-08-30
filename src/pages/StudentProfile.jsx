@@ -9,35 +9,59 @@ import {
   UserRound,
   Sparkles,
   Check,
+  ChevronDown,
   Code2,
   Database,
   Palette,
   Cloud,
   BarChart3,
   ShieldCheck,
+  MessageSquareText,
 } from "lucide-react";
-
-
 
 function StudentProfile() {
   const navigate = useNavigate();
 
-  // =========================================
-  // PROFILE INTERESTS
-  // =========================================
+  // ============================================================
+  // PROFILE DATA
+  // ============================================================
 
   const [selectedInterests, setSelectedInterests] = useState([]);
+
+  // Structured skills:
+  // [
+  //   { name: "Python", level: "Intermediate" },
+  //   { name: "React", level: "Beginner" }
+  // ]
+
+  const [selectedSkills, setSelectedSkills] = useState([]);
+
+  // Optional free-text skills
+  const [skillsText, setSkillsText] = useState("");
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
-  // =========================================
-  // INTEREST CATEGORIES + SKILLS
-  // =========================================
+  // ============================================================
+  // SKILL LEVELS
+  // ============================================================
+
+  const skillLevels = [
+    "Beginner",
+    "Intermediate",
+    "Advanced",
+  ];
+
+  // ============================================================
+  // INTEREST CATEGORIES
+  // ============================================================
 
   const interestCategories = [
     {
       title: "Technology & Development",
-      description: "Build software, websites and digital products.",
+      description:
+        "Build software, websites and digital products.",
       icon: <Code2 size={20} />,
       skills: [
         "Web Development",
@@ -51,7 +75,8 @@ function StudentProfile() {
 
     {
       title: "Cybersecurity",
-      description: "Protect systems, networks and digital information.",
+      description:
+        "Protect systems, networks and digital information.",
       icon: <ShieldCheck size={20} />,
       skills: [
         "Cybersecurity",
@@ -65,7 +90,8 @@ function StudentProfile() {
 
     {
       title: "Artificial Intelligence & Data",
-      description: "Work with intelligent systems, data and analytics.",
+      description:
+        "Work with intelligent systems, data and analytics.",
       icon: <BarChart3 size={20} />,
       skills: [
         "Artificial Intelligence",
@@ -79,7 +105,8 @@ function StudentProfile() {
 
     {
       title: "Cloud & Infrastructure",
-      description: "Work with cloud platforms and modern infrastructure.",
+      description:
+        "Work with cloud platforms and modern infrastructure.",
       icon: <Cloud size={20} />,
       skills: [
         "Cloud Computing",
@@ -93,7 +120,8 @@ function StudentProfile() {
 
     {
       title: "Data & Databases",
-      description: "Organize, manage and work with digital information.",
+      description:
+        "Organize, manage and work with digital information.",
       icon: <Database size={20} />,
       skills: [
         "Database Management",
@@ -107,7 +135,8 @@ function StudentProfile() {
 
     {
       title: "Design & Creativity",
-      description: "Create engaging digital experiences and visuals.",
+      description:
+        "Create engaging digital experiences and visuals.",
       icon: <Palette size={20} />,
       skills: [
         "UI/UX Design",
@@ -120,121 +149,361 @@ function StudentProfile() {
     },
   ];
 
-  // =========================================
-  // LOAD EXISTING INTERESTS
-  // =========================================
+  // ============================================================
+  // LOAD EXISTING PROFILE
+  // ============================================================
 
   useEffect(() => {
-    loadStudentInterests();
+    loadStudentProfile();
   }, []);
 
-  const loadStudentInterests = async () => {
-    try {
-      setLoading(true);
+  async function loadStudentProfile() {
+    setLoading(true);
+    setError("");
 
-      // Check logged-in user
+    try {
+      // ----------------------------------------------------------
+      // GET LOGGED-IN USER
+      // ----------------------------------------------------------
+
       const {
         data: { user },
         error: authError,
       } = await supabase.auth.getUser();
 
-      if (authError || !user) {
-        console.error("No logged-in user:", authError);
+      if (authError) {
+        throw authError;
+      }
+
+      if (!user) {
         navigate("/login");
         return;
       }
 
-      // Get previously saved interests
-      const { data, error } = await supabase
-        .from("students")
-        .select("interests")
-        .eq("auth_id", user.id)
-        .single();
+      // ----------------------------------------------------------
+      // GET EXISTING STUDENT DATA
+      // ----------------------------------------------------------
 
-      if (error) {
-        console.error("Interest loading error:", error);
-        setSelectedInterests([]);
-        return;
+      const {
+        data,
+        error: studentError,
+      } = await supabase
+        .from("students")
+        .select("interests, skills")
+        .eq("auth_id", user.id)
+        .maybeSingle();
+
+      if (studentError) {
+        throw studentError;
       }
 
-      setSelectedInterests(
-        Array.isArray(data?.interests) ? data.interests : []
+      // ==========================================================
+      // LOAD INTERESTS
+      // ==========================================================
+
+      let interests = data?.interests || [];
+
+      if (typeof interests === "string") {
+        try {
+          interests = JSON.parse(interests);
+        } catch {
+          interests = interests
+            .split(",")
+            .map((item) => item.trim())
+            .filter(Boolean);
+        }
+      }
+
+      if (!Array.isArray(interests)) {
+        interests = [];
+      }
+
+      setSelectedInterests(interests);
+
+      // ==========================================================
+      // LOAD SKILLS
+      // ==========================================================
+
+      let skills = data?.skills || [];
+
+      if (typeof skills === "string") {
+        try {
+          skills = JSON.parse(skills);
+        } catch {
+          skills = skills
+            .split(",")
+            .map((item) => item.trim())
+            .filter(Boolean);
+        }
+      }
+
+      if (!Array.isArray(skills)) {
+        skills = [];
+      }
+
+      // ----------------------------------------------------------
+      // Support OLD format:
+      // ["Python", "React", "SQL"]
+      //
+      // Support NEW format:
+      // [
+      //   { name: "Python", level: "Intermediate" },
+      //   { name: "React", level: "Beginner" }
+      // ]
+      // ----------------------------------------------------------
+
+      const structuredSkills = skills
+        .map((skill) => {
+          if (typeof skill === "string") {
+            return {
+              name: skill,
+              level: "Beginner",
+            };
+          }
+
+          if (
+            skill &&
+            typeof skill === "object" &&
+            skill.name
+          ) {
+            return {
+              name: skill.name,
+              level: skill.level || "Beginner",
+            };
+          }
+
+          return null;
+        })
+        .filter(Boolean);
+
+      setSelectedSkills(structuredSkills);
+
+      // ----------------------------------------------------------
+      // Existing skill names also appear in the optional text box
+      // for backward compatibility.
+      // ----------------------------------------------------------
+
+      const skillNames = structuredSkills
+        .map((skill) => skill.name)
+        .filter(Boolean);
+
+      setSkillsText(skillNames.join(", "));
+    } catch (err) {
+      console.error(
+        "Profile loading error:",
+        err
       );
-    } catch (error) {
-      console.error("Profile loading error:", error);
-      setSelectedInterests([]);
+
+      setError(
+        err.message ||
+          "Unable to load your profile."
+      );
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  // =========================================
-  // TOGGLE SKILL
-  // =========================================
+  // ============================================================
+  // TOGGLE INTEREST
+  // ============================================================
 
-  const toggleInterest = (interest) => {
-    setSelectedInterests((prev) => {
-      if (prev.includes(interest)) {
-        return prev.filter((item) => item !== interest);
+  function toggleInterest(interest) {
+    setSelectedInterests((previous) => {
+      if (previous.includes(interest)) {
+        return previous.filter(
+          (item) => item !== interest
+        );
       }
 
-      return [...prev, interest];
+      return [...previous, interest];
     });
-  };
+  }
 
-  // =========================================
-  // SAVE INTERESTS + CONTINUE
-  // =========================================
+  // ============================================================
+  // TOGGLE SKILL
+  // ============================================================
 
-  const handleContinue = async (e) => {
-    e.preventDefault();
+  function toggleSkill(skill) {
+    setSelectedSkills((previous) => {
+      const exists = previous.some(
+        (item) => item.name === skill
+      );
 
+      if (exists) {
+        return previous.filter(
+          (item) => item.name !== skill
+        );
+      }
+
+      return [
+        ...previous,
+        {
+          name: skill,
+          level: "Beginner",
+        },
+      ];
+    });
+  }
+
+  // ============================================================
+  // CHANGE SKILL LEVEL
+  // ============================================================
+
+  function changeSkillLevel(skillName, level) {
+    setSelectedSkills((previous) =>
+      previous.map((skill) =>
+        skill.name === skillName
+          ? {
+              ...skill,
+              level,
+            }
+          : skill
+      )
+    );
+  }
+
+  // ============================================================
+  // GET SELECTED SKILL
+  // ============================================================
+
+  function getSelectedSkill(skillName) {
+    return selectedSkills.find(
+      (skill) => skill.name === skillName
+    );
+  }
+
+  // ============================================================
+  // SAVE PROFILE
+  // ============================================================
+
+  async function handleContinue(event) {
+    event.preventDefault();
+
+    setError("");
+
+    // Interests remain required.
     if (selectedInterests.length === 0) {
-      alert("Please select at least one area of interest.");
+      setError(
+        "Please select at least one area of interest."
+      );
       return;
     }
 
+    setSaving(true);
+
     try {
-      setSaving(true);
+      // ----------------------------------------------------------
+      // GET USER
+      // ----------------------------------------------------------
 
       const {
         data: { user },
         error: userError,
       } = await supabase.auth.getUser();
 
-      if (userError || !user) {
-        alert("Please login again.");
+      if (userError) {
+        throw userError;
+      }
+
+      if (!user) {
         navigate("/login");
         return;
       }
 
-      const { error } = await supabase
+      // ----------------------------------------------------------
+      // OPTIONAL EXTRA SKILLS
+      // ----------------------------------------------------------
+
+      const extraSkills = skillsText
+        .split(",")
+        .map((skill) => skill.trim())
+        .filter(Boolean);
+
+      // ----------------------------------------------------------
+      // COMBINE STRUCTURED SKILLS + FREE TEXT SKILLS
+      //
+      // Prevent duplicates.
+      //
+      // Skills selected from the cards keep their level.
+      // Extra skills from the text box get Beginner by default.
+      // ----------------------------------------------------------
+
+      const skillMap = new Map();
+
+      selectedSkills.forEach((skill) => {
+        if (skill?.name?.trim()) {
+          skillMap.set(skill.name.trim().toLowerCase(), {
+            name: skill.name.trim(),
+            level:
+              skill.level || "Beginner",
+          });
+        }
+      });
+
+      extraSkills.forEach((skill) => {
+        const key = skill.toLowerCase();
+
+        if (!skillMap.has(key)) {
+          skillMap.set(key, {
+            name: skill,
+            level: "Beginner",
+          });
+        }
+      });
+
+      const finalSkills = Array.from(
+        skillMap.values()
+      );
+
+      // ----------------------------------------------------------
+      // SAVE EXISTING DATABASE FIELD
+      // ----------------------------------------------------------
+
+      const {
+        error: updateError,
+      } = await supabase
         .from("students")
         .update({
           interests: selectedInterests,
+          skills: finalSkills,
         })
         .eq("auth_id", user.id);
 
-      if (error) {
-        console.error("INTEREST SAVE ERROR:", error);
-        alert(error.message);
-        return;
+      if (updateError) {
+        throw updateError;
       }
 
-      console.log("INTERESTS SAVED SUCCESSFULLY");
+      console.log(
+        "STUDENT PROFILE SAVED SUCCESSFULLY:",
+        {
+          interests: selectedInterests,
+          skills: finalSkills,
+        }
+      );
+
+      // ----------------------------------------------------------
+      // NEXT PAGE
+      // ----------------------------------------------------------
 
       navigate("/career-selection");
-    } catch (error) {
-      console.error("PROFILE SAVE ERROR:", error);
-      alert("Something went wrong while saving your interests.");
+    } catch (err) {
+      console.error(
+        "PROFILE SAVE ERROR:",
+        err
+      );
+
+      setError(
+        err.message ||
+          "Something went wrong while saving your profile."
+      );
     } finally {
       setSaving(false);
     }
-  };
+  }
 
-  // =========================================
+  // ============================================================
   // LOADING SCREEN
-  // =========================================
+  // ============================================================
 
   if (loading) {
     return (
@@ -242,27 +511,31 @@ function StudentProfile() {
         <div className="profile-loading">
           <Sparkles size={28} />
 
-          <p>Loading your interests...</p>
+          <p>
+            Loading your profile...
+          </p>
         </div>
       </div>
     );
   }
 
-  // =========================================
+  // ============================================================
   // PAGE
-  // =========================================
+  // ============================================================
 
   return (
     <div className="profile-page">
 
-      {/* =====================================
+      {/* ======================================================
           HEADER
-      ====================================== */}
+      ====================================================== */}
 
       <header className="profile-header">
 
-        <Link to="/" className="auth-brand">
-
+        <Link
+          to="/"
+          className="auth-brand"
+        >
           <div className="brand-mark">
             <Sparkles size={18} />
           </div>
@@ -276,24 +549,24 @@ function StudentProfile() {
               AI
             </span>
           </div>
-
         </Link>
 
         <div className="profile-progress-text">
-          PROFILE SETUP <span>02 / 03</span>
+          PROFILE SETUP{" "}
+          <span>02 / 03</span>
         </div>
 
       </header>
 
-      {/* =====================================
+      {/* ======================================================
           MAIN
-      ====================================== */}
+      ====================================================== */}
 
       <main className="profile-main">
 
-        {/* ===================================
-            SIDEBAR
-        ==================================== */}
+        {/* ====================================================
+            JOURNEY
+        ==================================================== */}
 
         <aside className="profile-sidebar">
 
@@ -310,15 +583,13 @@ function StudentProfile() {
             </h2>
 
             <p>
-              Tell us about the areas you're interested
-              in. Choose as many skills as you'd like —
-              we'll use them to understand your career
-              direction.
+              Tell us about your interests and current
+              skills. CareerPath AI will use this
+              information to understand which career
+              paths fit you best.
             </p>
 
           </div>
-
-          {/* JOURNEY STEPS */}
 
           <div className="setup-steps">
 
@@ -331,8 +602,13 @@ function StudentProfile() {
               </div>
 
               <div>
-                <small>STEP 01</small>
-                <strong>About You</strong>
+                <small>
+                  STEP 01
+                </small>
+
+                <strong>
+                  About You
+                </strong>
               </div>
 
             </div>
@@ -348,8 +624,13 @@ function StudentProfile() {
               </div>
 
               <div>
-                <small>STEP 02</small>
-                <strong>Interests</strong>
+                <small>
+                  STEP 02
+                </small>
+
+                <strong>
+                  Profile
+                </strong>
               </div>
 
             </div>
@@ -365,8 +646,13 @@ function StudentProfile() {
               </div>
 
               <div>
-                <small>STEP 03</small>
-                <strong>Career Goals</strong>
+                <small>
+                  STEP 03
+                </small>
+
+                <strong>
+                  Career Path
+                </strong>
               </div>
 
             </div>
@@ -375,13 +661,11 @@ function StudentProfile() {
 
         </aside>
 
-        {/* ===================================
-            RIGHT CONTENT
-        ==================================== */}
+        {/* ====================================================
+            FORM SECTION
+        ==================================================== */}
 
         <section className="profile-form-section">
-
-          {/* PAGE HEADING */}
 
           <div className="form-heading">
 
@@ -389,115 +673,251 @@ function StudentProfile() {
 
               <span />
 
-              YOUR INTERESTS
+              YOUR PROFILE
+
+              <span />
 
             </div>
 
             <h1>
-              What are you
+              What drives
               <br />
-              <span>interested in?</span>
+              <span>your career?</span>
             </h1>
 
             <p>
-              Select the areas and skills that excite you.
-              You can choose multiple skills across
-              different categories.
+              Select the areas you're interested in
+              and tell us about the skills you already
+              have.
             </p>
 
           </div>
-
-          {/* =================================
-              INTEREST FORM
-          ================================== */}
 
           <form
             className="profile-form"
             onSubmit={handleContinue}
           >
 
-            {/* =================================
-                CATEGORIES
-            ================================== */}
+            {/* =================================================
+                INTERESTS
+            ================================================= */}
 
-            {interestCategories.map((category) => (
+            <section className="profile-review-card">
 
-              <section
-                className="profile-review-card"
-                key={category.title}
-              >
+              <div className="profile-review-header">
 
-                {/* CATEGORY HEADER */}
+                <div>
 
-                <div className="profile-review-header">
+                  <span className="review-kicker">
+                    INTERESTS
+                  </span>
 
-                  <div>
+                  <h2>
+                    What interests you?
+                  </h2>
+
+                  <p className="review-description">
+                    Select the areas you'd like to
+                    explore as a career.
+                  </p>
+
+                </div>
+
+                <div className="review-header-icon">
+                  <Sparkles size={19} />
+                </div>
+
+              </div>
+
+              <div className="interest-grid">
+
+                {interestCategories.map(
+                  (category) =>
+                    category.skills.map(
+                      (skill) => {
+
+                        const selectedSkill =
+                          getSelectedSkill(skill);
+
+                        const selected =
+                          Boolean(selectedSkill);
+
+                        return (
+                          <div
+                            key={skill}
+                            className={`skill-selection-wrapper ${
+                              selected
+                                ? "selected"
+                                : ""
+                            }`}
+                          >
+
+                            {/* SKILL BUTTON */}
+
+                            <button
+                              type="button"
+                              className={`interest-chip ${
+                                selected
+                                  ? "selected"
+                                  : ""
+                              }`}
+                              onClick={() =>
+                                toggleSkill(skill)
+                              }
+                              aria-expanded={selected}
+                            >
+
+                              <span>
+                                {skill}
+                              </span>
+
+                              <span className="interest-chip-right">
+
+                                {selected && (
+                                  <Check size={13} />
+                                )}
+
+                                <ChevronDown
+                                  size={13}
+                                  className={`skill-dropdown-chevron ${
+                                    selected
+                                      ? "open"
+                                      : ""
+                                  }`}
+                                />
+
+                              </span>
+
+                            </button>
+
+                            {/* LEVEL SELECTOR */}
+
+                            {selected && (
+                              <div className="skill-level-box">
+
+                                <span>
+                                  Skill Level
+                                </span>
+
+                                <select
+                                  value={
+                                    selectedSkill.level ||
+                                    "Beginner"
+                                  }
+                                  onChange={(event) =>
+                                    changeSkillLevel(
+                                      skill,
+                                      event.target.value
+                                    )
+                                  }
+                                  onClick={(event) =>
+                                    event.stopPropagation()
+                                  }
+                                >
+
+                                  {skillLevels.map(
+                                    (level) => (
+                                      <option
+                                        key={level}
+                                        value={level}
+                                      >
+                                        {level}
+                                      </option>
+                                    )
+                                  )}
+
+                                </select>
+
+                              </div>
+                            )}
+
+                          </div>
+                        );
+                      }
+                    )
+                )}
+
+              </div>
+
+            </section>
+
+            {/* =================================================
+                CURRENT SKILLS
+            ================================================= */}
+
+            <section className="profile-review-card skills-message-card">
+
+              <div className="profile-review-header">
+
+                <div>
+
+                  <div className="review-kicker-row">
 
                     <span className="review-kicker">
-                      INTEREST AREA
+                      CURRENT SKILLS
                     </span>
 
-                    <h2>
-                      {category.title}
-                    </h2>
-
-                    <p className="review-description">
-                      {category.description}
-                    </p>
+                    <span className="optional-label">
+                      OPTIONAL
+                    </span>
 
                   </div>
 
-                  <div className="review-header-icon">
-                    {category.icon}
-                  </div>
+                  <h2>
+                    What can you do?
+                  </h2>
+
+                  <p className="review-description">
+                    Already know some skills, tools or
+                    technologies? Add anything that isn't
+                    listed above.
+                  </p>
 
                 </div>
 
-                {/* SKILLS */}
-
-                <div className="interest-grid">
-
-                  {category.skills.map((skill) => {
-
-                    const selected =
-                      selectedInterests.includes(skill);
-
-                    return (
-
-                      <button
-                        key={skill}
-                        type="button"
-                        className={`interest-chip ${
-                          selected ? "selected" : ""
-                        }`}
-                        onClick={() =>
-                          toggleInterest(skill)
-                        }
-                      >
-
-                        <span>
-                          {skill}
-                        </span>
-
-                        {selected && (
-                          <Check size={15} />
-                        )}
-
-                      </button>
-
-                    );
-
-                  })}
-
+                <div className="review-header-icon">
+                  <MessageSquareText size={19} />
                 </div>
 
-              </section>
+              </div>
 
-            ))}
+              <div className="skills-message-wrapper">
 
-            {/* =================================
-                CONTINUE
-            ================================== */}
+                <MessageSquareText size={17} />
+
+                <textarea
+                  value={skillsText}
+                  onChange={(event) =>
+                    setSkillsText(
+                      event.target.value
+                    )
+                  }
+                  placeholder="e.g. Python, React, SQL, JavaScript, HTML/CSS, Git, Linux..."
+                  rows={6}
+                />
+
+              </div>
+
+              <p className="skills-message-hint">
+                Optional. Add additional skills separated
+                by commas.
+              </p>
+
+            </section>
+
+            {/* =================================================
+                ERROR
+            ================================================= */}
+
+            {error && (
+              <div className="profile-form-error">
+                {error}
+              </div>
+            )}
+
+            {/* =================================================
+                SUMMARY + CONTINUE
+            ================================================= */}
 
             <div className="profile-selection-footer">
 
@@ -505,6 +925,14 @@ function StudentProfile() {
 
                 {selectedInterests.length}{" "}
                 {selectedInterests.length === 1
+                  ? "interest"
+                  : "interests"}
+
+                {" • "}
+
+                {selectedSkills.length}{" "}
+
+                {selectedSkills.length === 1
                   ? "skill"
                   : "skills"}{" "}
                 selected
@@ -519,7 +947,7 @@ function StudentProfile() {
 
                 {saving
                   ? "Saving..."
-                  : "Continue to Career Selection"}
+                  : "Continue to Career Recommendations"}
 
                 {!saving && (
                   <ArrowRight size={17} />

@@ -1,283 +1,804 @@
-import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+export {};
 
-const corsHeaders = {
+declare const Deno: {
+  serve(
+    handler: (
+      request: Request,
+    ) => Response | Promise<Response>,
+  ): void;
+
+  env: {
+    get(name: string): string | undefined;
+  };
+};
+
+const corsHeaders: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Methods":
+    "POST, OPTIONS",
+  "Content-Type": "application/json",
 };
 
-serve(async (req: Request) => {
-  // ============================================================
-  // CORS
-  // ============================================================
+const GEMINI_MODEL = "gemini-3.5-flash-lite";
 
-  if (req.method === "OPTIONS") {
-    return new Response("ok", {
+interface Question {
+  id?: string;
+  question?: string;
+  option_a?: string;
+  option_b?: string;
+  option_c?: string;
+  option_d?: string;
+  correct_answer?: string;
+  max_score?: number;
+  difficulty?: string;
+  skill_mapping?: string;
+}
+
+interface AssessmentRow {
+  id: string;
+  user_id: string;
+  career: string;
+  questions: Question[];
+  completed: boolean;
+}
+
+interface AnswerMap {
+  [key: string]: string;
+}
+
+interface QuestionResult {
+  question_number: number;
+  question_id: string;
+  question: string;
+  user_answer: string | null;
+  correct_answer: string | null;
+  correct: boolean;
+  score: number;
+  max_score: number;
+  skill: string;
+  difficulty: string;
+}
+
+interface SkillProfileItem {
+  skill: string;
+  correct: number;
+  total: number;
+  percentage: number;
+}
+
+function jsonResponse(
+  body: unknown,
+  status = 200,
+): Response {
+  return new Response(
+    JSON.stringify(body),
+    {
+      status,
       headers: corsHeaders,
+    },
+  );
+}
+
+// ============================================================
+// SUPABASE REST
+// ============================================================
+
+async function supabaseRequest(
+  path: string,
+  options: RequestInit = {},
+): Promise<any> {
+  const supabaseUrl =
+    Deno.env.get("SUPABASE_URL");
+
+  const serviceRoleKey =
+    Deno.env.get(
+      "SUPABASE_SERVICE_ROLE_KEY",
+    );
+
+  if (!supabaseUrl) {
+    throw new Error(
+      "SUPABASE_URL is not configured.",
+    );
+  }
+
+  if (!serviceRoleKey) {
+    throw new Error(
+      "SUPABASE_SERVICE_ROLE_KEY is not configured.",
+    );
+  }
+
+  const response = await fetch(
+    `${supabaseUrl}${path}`,
+    {
+      ...options,
+      headers: {
+        apikey: serviceRoleKey,
+        Authorization:
+          `Bearer ${serviceRoleKey}`,
+        "Content-Type":
+          "application/json",
+        ...(options.headers || {}),
+      },
+    },
+  );
+
+  const text =
+    await response.text();
+
+  let data: any = null;
+
+  try {
+    data = text
+      ? JSON.parse(text)
+      : null;
+  } catch {
+    data = text;
+  }
+
+  if (!response.ok) {
+    console.error(
+      "SUPABASE REST ERROR:",
+      response.status,
+      data,
+    );
+
+    throw new Error(
+      data?.message ||
+        data?.details ||
+        data?.hint ||
+        data?.error ||
+        `Supabase request failed with status ${response.status}.`,
+    );
+  }
+
+  return data;
+}
+
+// ============================================================
+// ANSWERS
+// ============================================================
+
+function normalizeAnswers(
+  value: unknown,
+): AnswerMap {
+  if (
+    !value ||
+    typeof value !== "object" ||
+    Array.isArray(value)
+  ) {
+    return {};
+  }
+
+  const result: AnswerMap = {};
+
+  for (
+    const [key, rawValue] of Object.entries(
+      value as Record<string, unknown>,
+    )
+  ) {
+    if (
+      typeof rawValue === "string"
+    ) {
+      result[String(key)] =
+        rawValue
+          .trim()
+          .toUpperCase();
+    }
+  }
+
+  return result;
+}
+
+function getAnswerForQuestion(
+  question: Question,
+  index: number,
+  answers: AnswerMap,
+): string | null {
+  const possibleKeys = [
+    question.id,
+    `question-${index + 1}`,
+    String(index),
+    String(index + 1),
+  ].filter(Boolean) as string[];
+
+  for (
+    const key of possibleKeys
+  ) {
+    const answer =
+      answers[String(key)];
+
+    if (
+      typeof answer === "string" &&
+      answer.trim() !== ""
+    ) {
+      return answer
+        .trim()
+        .toUpperCase();
+    }
+  }
+
+  return null;
+}
+
+// ============================================================
+// FETCH ASSESSMENT
+// ============================================================
+
+async function getAssessment(
+  assessmentId: string,
+  userId: string,
+): Promise<AssessmentRow> {
+  const encodedAssessmentId =
+    encodeURIComponent(
+      assessmentId,
+    );
+
+  const encodedUserId =
+    encodeURIComponent(
+      userId,
+    );
+
+  const rows =
+    await supabaseRequest(
+      `/rest/v1/generated_assessments?id=eq.${encodedAssessmentId}&user_id=eq.${encodedUserId}&select=id,user_id,career,questions,completed`,
+      {
+        method: "GET",
+      },
+    );
+
+  if (
+    !Array.isArray(rows) ||
+    rows.length === 0
+  ) {
+    throw new Error(
+      "Generated assessment was not found.",
+    );
+  }
+
+  const row = rows[0];
+
+  let questions =
+    row.questions;
+
+  if (
+    typeof questions === "string"
+  ) {
+    try {
+      questions =
+        JSON.parse(questions);
+    } catch {
+      throw new Error(
+        "Stored assessment questions are invalid JSON.",
+      );
+    }
+  }
+
+  if (
+    !Array.isArray(questions) ||
+    questions.length !== 5
+  ) {
+    throw new Error(
+      "Generated assessment must contain exactly 5 questions.",
+    );
+  }
+
+  return {
+    id: String(row.id),
+    user_id: String(row.user_id),
+    career: String(row.career),
+    questions,
+    completed:
+      Boolean(row.completed),
+  };
+}
+
+// ============================================================
+// SCORE
+// ============================================================
+
+function calculateScore(
+  questions: Question[],
+  answers: AnswerMap,
+) {
+  let score = 0;
+  let totalScore = 0;
+
+  const questionResults: QuestionResult[] =
+    [];
+
+  for (
+    let index = 0;
+    index < questions.length;
+    index++
+  ) {
+    const question =
+      questions[index];
+
+    const maxScore =
+      Number(
+        question.max_score,
+      ) || 5;
+
+    const userAnswer =
+      getAnswerForQuestion(
+        question,
+        index,
+        answers,
+      );
+
+    const correctAnswer =
+      typeof question.correct_answer ===
+      "string"
+        ? question.correct_answer
+            .trim()
+            .toUpperCase()
+        : null;
+
+    const isCorrect =
+      !!userAnswer &&
+      !!correctAnswer &&
+      userAnswer === correctAnswer;
+
+    if (isCorrect) {
+      score += maxScore;
+    }
+
+    totalScore += maxScore;
+
+    questionResults.push({
+      question_number:
+        index + 1,
+
+      question_id:
+        String(
+          question.id ||
+            `question-${index + 1}`,
+        ),
+
+      question:
+        String(
+          question.question || "",
+        ),
+
+      user_answer:
+        userAnswer,
+
+      correct_answer:
+        correctAnswer,
+
+      correct:
+        isCorrect,
+
+      score:
+        isCorrect
+          ? maxScore
+          : 0,
+
+      max_score:
+        maxScore,
+
+      skill:
+        String(
+          question.skill_mapping ||
+            "General",
+        ),
+
+      difficulty:
+        String(
+          question.difficulty ||
+            "Intermediate",
+        ),
     });
   }
 
-  try {
-    // ============================================================
-    // 1. GET GEMINI API KEY
-    // ============================================================
+  const percentage =
+    totalScore > 0
+      ? Math.round(
+          (score /
+            totalScore) *
+            100,
+        )
+      : 0;
 
-    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+  let overallLevel:
+    | "Beginner"
+    | "Intermediate"
+    | "Advanced" =
+    "Beginner";
 
-    if (!GEMINI_API_KEY) {
-      throw new Error("GEMINI_API_KEY is not configured.");
+  if (percentage >= 80) {
+    overallLevel =
+      "Advanced";
+  } else if (percentage >= 60) {
+    overallLevel =
+      "Intermediate";
+  }
+
+  return {
+    score,
+    totalScore,
+    percentage,
+    overallLevel,
+    questionResults,
+  };
+}
+
+// ============================================================
+// AGGREGATED SKILL PROFILE
+// ============================================================
+
+function buildSkillProfile(
+  questionResults: QuestionResult[],
+): SkillProfileItem[] {
+  const skillMap =
+    new Map<
+      string,
+      {
+        correct: number;
+        total: number;
+      }
+    >();
+
+  for (
+    const item of questionResults
+  ) {
+    const existing =
+      skillMap.get(item.skill) || {
+        correct: 0,
+        total: 0,
+      };
+
+    existing.total += 1;
+
+    if (item.correct) {
+      existing.correct += 1;
     }
 
-    // ============================================================
-    // 2. READ REQUEST BODY
-    // ============================================================
+    skillMap.set(
+      item.skill,
+      existing,
+    );
+  }
 
-    const body = await req.json();
+  return Array.from(
+    skillMap.entries(),
+  ).map(
+    ([skill, value]) => ({
+      skill,
+      correct:
+        value.correct,
+      total:
+        value.total,
+      percentage:
+        value.total > 0
+          ? Math.round(
+              (value.correct /
+                value.total) *
+                100,
+            )
+          : 0,
+    }),
+  );
+}
 
-    const {
-      career,
-      score,
-      totalScore,
-      percentage,
-      skillProfile,
-      questions,
-    } = body;
+// ============================================================
+// FALLBACK ANALYSIS
+// ============================================================
 
-    console.log("=================================");
-    console.log("AI ANALYSIS REQUEST");
-    console.log("=================================");
-    console.log("Career:", career);
-    console.log("Score:", score);
-    console.log("Total Score:", totalScore);
-    console.log("Percentage:", percentage);
-    console.log(
-      "Skill Profile:",
-      JSON.stringify(skillProfile, null, 2)
+function fallbackAnalysis(
+  career: string,
+  score: number,
+  totalScore: number,
+  percentage: number,
+  skillProfile: SkillProfileItem[],
+) {
+  const strengths =
+    skillProfile
+      .filter(
+        (item) =>
+          item.percentage >= 70,
+      )
+      .map(
+        (item) => ({
+          skill:
+            item.skill,
+          reason:
+            `You demonstrated solid performance in ${item.skill}.`,
+        }),
+      );
+
+  const weaknesses =
+    skillProfile
+      .filter(
+        (item) =>
+          item.percentage < 70,
+      )
+      .map(
+        (item) => ({
+          skill:
+            item.skill,
+          reason:
+            `Your ${item.skill} performance shows an area that needs more practice.`,
+        }),
+      );
+
+  const skillGaps =
+    skillProfile
+      .filter(
+        (item) =>
+          item.percentage < 70,
+      )
+      .map(
+        (item) => ({
+          skill:
+            item.skill,
+          priority:
+            item.percentage < 40
+              ? "High"
+              : "Medium",
+          reason:
+            `Improving ${item.skill} will strengthen your ${career} foundation.`,
+        }),
+      );
+
+  return {
+    overall_level:
+      percentage >= 80
+        ? "Advanced"
+        : percentage >= 60
+          ? "Intermediate"
+          : "Beginner",
+
+    performance_analysis:
+      `You scored ${score} out of ${totalScore} (${percentage}%) in your ${career} assessment.`,
+
+    strengths,
+
+    weaknesses,
+
+    skill_gaps:
+      skillGaps,
+
+    recommendations: [
+      `Practice your lowest-scoring ${career} skills first.`,
+      "Use hands-on exercises to reinforce concepts.",
+      "Build projects that apply the skills tested in this assessment.",
+    ],
+
+    roadmap: [
+      {
+        week: 1,
+        title:
+          "Strengthen Fundamentals",
+        tasks: [
+          "Review incorrect answers.",
+          "Study the related concepts.",
+          "Complete focused exercises.",
+        ],
+      },
+      {
+        week: 2,
+        title:
+          "Practical Practice",
+        tasks: [
+          "Solve realistic problems.",
+          "Build small exercises.",
+          "Review mistakes.",
+        ],
+      },
+      {
+        week: 3,
+        title:
+          "Build a Project",
+        tasks: [
+          `Start a ${career} project.`,
+          "Apply weak skills.",
+          "Test and improve the project.",
+        ],
+      },
+      {
+        week: 4,
+        title:
+          "Portfolio Preparation",
+        tasks: [
+          "Complete the project.",
+          "Document what you learned.",
+          "Prepare it for your portfolio.",
+        ],
+      },
+    ],
+
+    projects: [
+      {
+        title:
+          `${career} Starter Project`,
+        difficulty:
+          "Beginner",
+        description:
+          `Build a beginner-friendly ${career} project using your core skills.`,
+        skills:
+          skillProfile
+            .slice(0, 2)
+            .map(
+              (item) =>
+                item.skill,
+            ),
+        why_this_project:
+          "It gives you practical experience while reinforcing your assessment skills.",
+      },
+    ],
+  };
+}
+
+// ============================================================
+// GEMINI ANALYSIS
+// ============================================================
+
+async function generateAIAnalysis(
+  career: string,
+  score: number,
+  totalScore: number,
+  percentage: number,
+  skillProfile: SkillProfileItem[],
+  questionResults: QuestionResult[],
+) {
+  const apiKey =
+    Deno.env.get(
+      "GEMINI_API_KEY",
     );
 
-    // ============================================================
-    // 3. VALIDATE INPUT
-    // ============================================================
+  if (!apiKey) {
+    throw new Error(
+      "GEMINI_API_KEY is not configured.",
+    );
+  }
 
-    if (!career) {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          error: "Career is missing.",
-        }),
-        {
-          status: 400,
-          headers: {
-            ...corsHeaders,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    }
+  const prompt = `
+You are CareerPath AI, an expert career mentor.
 
-    if (!Array.isArray(skillProfile)) {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          error: "Skill profile is missing or invalid.",
-        }),
-        {
-          status: 400,
-          headers: {
-            ...corsHeaders,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    }
+Analyze this completed ${career} assessment.
 
-    // ============================================================
-    // 4. GEMINI PROMPT
-    // ============================================================
+SOURCE OF TRUTH:
 
-    const prompt = `
-You are CareerPath AI, an AI-powered career mentor.
-
-Analyze the student's career assessment.
-
-IMPORTANT:
-The supplied skill profile is the SOURCE OF TRUTH for the student's
-actual assessment performance.
-
-Do NOT invent or change the scores.
-
-CAREER:
-${career}
-
-ASSESSMENT SCORE:
+Score:
 ${score}/${totalScore}
 
-PERCENTAGE:
+Percentage:
 ${percentage}%
 
-SKILL PROFILE:
-${JSON.stringify(skillProfile, null, 2)}
+Skill profile:
+${JSON.stringify(
+  skillProfile,
+  null,
+  2,
+)}
 
-QUESTIONS AND ANSWERS:
-${JSON.stringify(questions || [], null, 2)}
+Question results:
+${JSON.stringify(
+  questionResults,
+  null,
+  2,
+)}
 
-============================================================
-YOUR TASK
-============================================================
+Do not change the score.
 
-Generate a complete personalized career analysis.
+Return ONLY valid JSON.
 
-You MUST provide ALL of the following:
-
-1. overall_level
-2. performance_analysis
-3. strengths
-4. weaknesses
-5. skill_gaps
-6. recommendations
-7. roadmap
-8. projects
-
-IMPORTANT RULES:
-
-- Use the supplied skill_profile as the source of truth.
-- Do not invent assessment scores.
-- If a skill has 100%, it should normally be considered a strength.
-- If a skill has 0% or a low percentage, it should normally appear as a weakness or skill gap.
-- Recommendations must match the selected career.
-- Roadmap must be realistic for the student's current level.
-- Projects must match the selected career and current skill level.
-- Do not leave any requested field out.
-- Return ALL fields even if some arrays contain only one item.
-- Return ONLY valid JSON.
-- Do NOT use markdown.
-- Do NOT wrap the JSON inside \`\`\`json.
-
-============================================================
-REQUIRED JSON FORMAT
-============================================================
+Required structure:
 
 {
-  "overall_level": "Beginner | Intermediate | Advanced",
-
-  "performance_analysis": "A short personalized explanation of the student's current performance and what it means for their career.",
+  "overall_level": "Beginner",
+  "performance_analysis": "string",
 
   "strengths": [
     {
-      "skill": "Skill name",
-      "reason": "Why this skill is a strength based on the assessment."
+      "skill": "string",
+      "reason": "string"
     }
   ],
 
   "weaknesses": [
     {
-      "skill": "Skill name",
-      "reason": "Why this skill needs improvement based on the assessment."
+      "skill": "string",
+      "reason": "string"
     }
   ],
 
   "skill_gaps": [
     {
-      "skill": "Skill name",
-      "priority": "High | Medium | Low",
-      "reason": "Why learning this skill matters for the selected career."
+      "skill": "string",
+      "priority": "High",
+      "reason": "string"
     }
   ],
 
   "recommendations": [
-    "Practical recommendation 1",
-    "Practical recommendation 2",
-    "Practical recommendation 3"
+    "string",
+    "string",
+    "string"
   ],
 
   "roadmap": [
     {
       "week": 1,
-      "title": "Week 1 topic",
+      "title": "string",
       "tasks": [
-        "Task 1",
-        "Task 2",
-        "Task 3"
+        "string",
+        "string",
+        "string"
       ]
     },
     {
       "week": 2,
-      "title": "Week 2 topic",
+      "title": "string",
       "tasks": [
-        "Task 1",
-        "Task 2",
-        "Task 3"
+        "string",
+        "string",
+        "string"
       ]
     },
     {
       "week": 3,
-      "title": "Week 3 topic",
+      "title": "string",
       "tasks": [
-        "Task 1",
-        "Task 2",
-        "Task 3"
+        "string",
+        "string",
+        "string"
       ]
     },
     {
       "week": 4,
-      "title": "Week 4 topic",
+      "title": "string",
       "tasks": [
-        "Task 1",
-        "Task 2",
-        "Task 3"
+        "string",
+        "string",
+        "string"
       ]
     }
   ],
 
   "projects": [
     {
-      "title": "Project name",
-      "difficulty": "Beginner | Intermediate | Advanced",
-      "description": "What the project does.",
+      "title": "string",
+      "difficulty": "Beginner",
+      "description": "string",
       "skills": [
-        "Skill 1",
-        "Skill 2"
+        "string",
+        "string"
       ],
-      "why_this_project": "Why this project is suitable for the student."
-    },
-    {
-      "title": "Project name",
-      "difficulty": "Beginner | Intermediate | Advanced",
-      "description": "What the project does.",
-      "skills": [
-        "Skill 1",
-        "Skill 2"
-      ],
-      "why_this_project": "Why this project is suitable for the student."
-    },
-    {
-      "title": "Project name",
-      "difficulty": "Beginner | Intermediate | Advanced",
-      "description": "What the project does.",
-      "skills": [
-        "Skill 1",
-        "Skill 2"
-      ],
-      "why_this_project": "Why this project is suitable for the student."
+      "why_this_project": "string"
     }
   ]
 }
+
+Rules:
+
+- Use the supplied skill profile as the source of truth.
+- Do not invent scores.
+- Keep the score ${score}/${totalScore}.
+- Keep the percentage ${percentage}%.
+- Recommendations must match ${career}.
+- Roadmap must match the student's current level.
+- Projects must match ${career}.
+- Return valid JSON only.
 `;
 
-    console.log("Sending request to Gemini...");
+  const url =
+    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`;
 
-    // ============================================================
-    // 5. CALL GEMINI
-    // ============================================================
-
-    const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`,
+  const response =
+    await fetch(
+      url,
       {
         method: "POST",
+
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type":
+            "application/json",
         },
+
         body: JSON.stringify({
           contents: [
             {
@@ -290,173 +811,418 @@ REQUIRED JSON FORMAT
           ],
 
           generationConfig: {
-            
-            responseMimeType: "application/json",
+            temperature: 0.4,
+            responseMimeType:
+              "application/json",
           },
         }),
-      }
+      },
     );
 
-    const data = await geminiResponse.json();
+  const data =
+    await response.json();
 
-    console.log("=================================");
-    console.log("GEMINI RESPONSE");
-    console.log("=================================");
-    console.log(JSON.stringify(data, null, 2));
-
-    // ============================================================
-    // 6. HANDLE GEMINI ERROR
-    // ============================================================
-
-    if (!geminiResponse.ok) {
-      console.error("Gemini API error:", data);
-
-      throw new Error(
-        data?.error?.message ||
-          "Gemini API request failed."
-      );
-    }
-
-    // ============================================================
-    // 7. EXTRACT GENERATED TEXT
-    // ============================================================
-
-    const generatedText =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    console.log("GENERATED TEXT:");
-    console.log(generatedText);
-
-    if (!generatedText) {
-      throw new Error(
-        "Gemini returned an empty response."
-      );
-    }
-
-    // ============================================================
-    // 8. PARSE JSON
-    // ============================================================
-
-    let analysis;
-
-    try {
-      analysis = JSON.parse(generatedText);
-    } catch (parseError) {
-      console.error(
-        "Gemini JSON parse error:",
-        parseError
-      );
-
-      console.error(
-        "Invalid Gemini response:",
-        generatedText
-      );
-
-      throw new Error(
-        "Gemini returned invalid JSON."
-      );
-    }
-
-    // ============================================================
-    // 9. MAKE SURE SKILL PROFILE IS ALWAYS PRESENT
-    // ============================================================
-
-    analysis.skill_profile = skillProfile;
-
-    // ============================================================
-    // 10. ENSURE ALL REQUIRED FIELDS EXIST
-    // ============================================================
-
-    if (!Array.isArray(analysis.strengths)) {
-      analysis.strengths = [];
-    }
-
-    if (!Array.isArray(analysis.weaknesses)) {
-      analysis.weaknesses = [];
-    }
-
-    if (!Array.isArray(analysis.skill_gaps)) {
-      analysis.skill_gaps = [];
-    }
-
-    if (!Array.isArray(analysis.recommendations)) {
-      analysis.recommendations = [];
-    }
-
-    if (!Array.isArray(analysis.roadmap)) {
-      analysis.roadmap = [];
-    }
-
-    if (!Array.isArray(analysis.projects)) {
-      analysis.projects = [];
-    }
-
-    if (!analysis.overall_level) {
-      analysis.overall_level =
-        percentage >= 80
-          ? "Advanced"
-          : percentage >= 60
-          ? "Intermediate"
-          : "Beginner";
-    }
-
-    if (!analysis.performance_analysis) {
-      analysis.performance_analysis =
-        `You scored ${percentage}% in your ${career} assessment. Focus on strengthening the skills identified in your assessment and continue building practical experience.`;
-    }
-
-    // ============================================================
-    // 11. DEBUG COMPLETE ANALYSIS
-    // ============================================================
-
-    console.log("=================================");
-    console.log("FINAL COMPLETE AI ANALYSIS");
-    console.log("=================================");
-    console.log(
-      JSON.stringify(analysis, null, 2)
-    );
-
-    // ============================================================
-    // 12. RETURN COMPLETE ANALYSIS
-    // ============================================================
-
-    return new Response(
-      JSON.stringify({
-        success: true,
-        analysis: analysis,
-      }),
-      {
-        status: 200,
-        headers: {
-          ...corsHeaders,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-  } catch (error) {
-    console.error(
-      "================================="
-    );
-
-    console.error("AI ANALYSIS ERROR:", error);
-
-    const errorMessage =
-      error instanceof Error
-        ? `${error.name}: ${error.message}`
-        : String(error);
-
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: errorMessage,
-      }),
-      {
-        status: 500,
-        headers: {
-          ...corsHeaders,
-          "Content-Type": "application/json",
-        },
-      }
+  if (!response.ok) {
+    throw new Error(
+      data?.error?.message ||
+        "Gemini API request failed.",
     );
   }
-});
+
+  const text =
+    data?.candidates?.[0]
+      ?.content?.parts?.[0]?.text;
+
+  if (!text) {
+    throw new Error(
+      "Gemini returned an empty response.",
+    );
+  }
+
+  let parsed: any;
+
+  try {
+    parsed =
+      JSON.parse(text);
+  } catch {
+    const cleaned =
+      text
+        .replace(/^```json\s*/i, "")
+        .replace(/^```\s*/i, "")
+        .replace(/\s*```$/i, "")
+        .trim();
+
+    parsed =
+      JSON.parse(cleaned);
+  }
+
+  return parsed;
+}
+
+// ============================================================
+// MARK AS COMPLETED
+// ============================================================
+
+async function markCompleted(
+  assessmentId: string,
+) {
+  const encodedId =
+    encodeURIComponent(
+      assessmentId,
+    );
+
+  await supabaseRequest(
+    `/rest/v1/generated_assessments?id=eq.${encodedId}`,
+    {
+      method: "PATCH",
+
+      headers: {
+        Prefer:
+          "return=minimal",
+      },
+
+      body: JSON.stringify({
+        completed: true,
+      }),
+    },
+  );
+}
+
+// ============================================================
+// SAVE RESULT
+// ============================================================
+
+async function saveAssessmentResult(
+  userId: string,
+  career: string,
+  score: number,
+  totalScore: number,
+  percentage: number,
+  answers: AnswerMap,
+  aiAnalysis: unknown,
+) {
+  const payload = {
+    user_id:
+      userId,
+
+    career,
+
+    score,
+
+    total_score:
+      totalScore,
+
+    percentage,
+
+    answers,
+
+    ai_analysis:
+      aiAnalysis,
+  };
+
+  const saved =
+    await supabaseRequest(
+      "/rest/v1/assessment_results",
+      {
+        method: "POST",
+
+        headers: {
+          Prefer:
+            "return=representation",
+        },
+
+        body:
+          JSON.stringify(payload),
+      },
+    );
+
+  const row =
+    Array.isArray(saved)
+      ? saved[0]
+      : saved;
+
+  if (!row) {
+    throw new Error(
+      "Assessment result was not returned after saving.",
+    );
+  }
+
+  return row;
+}
+
+// ============================================================
+// MAIN EDGE FUNCTION
+// ============================================================
+
+Deno.serve(
+  async (
+    req: Request,
+  ): Promise<Response> => {
+    if (
+      req.method === "OPTIONS"
+    ) {
+      return new Response(
+        "ok",
+        {
+          status: 200,
+          headers:
+            corsHeaders,
+        },
+      );
+    }
+
+    if (
+      req.method !== "POST"
+    ) {
+      return jsonResponse(
+        {
+          success: false,
+          error:
+            "Method not allowed.",
+        },
+        405,
+      );
+    }
+
+    try {
+      const body =
+        (await req.json()) as Record<
+          string,
+          unknown
+        >;
+
+      const assessmentId =
+        typeof body.assessment_id ===
+        "string"
+          ? body.assessment_id.trim()
+          : "";
+
+      const userId =
+        typeof body.user_id ===
+        "string"
+          ? body.user_id.trim()
+          : "";
+
+      const requestedCareer =
+        typeof body.career ===
+        "string"
+          ? body.career.trim()
+          : "";
+
+      if (!assessmentId) {
+        throw new Error(
+          "assessment_id is missing.",
+        );
+      }
+
+      if (!userId) {
+        throw new Error(
+          "user_id is missing.",
+        );
+      }
+
+      const answers =
+        normalizeAnswers(
+          body.answers,
+        );
+
+      if (
+        Object.keys(answers)
+          .length === 0
+      ) {
+        throw new Error(
+          "No answers were submitted.",
+        );
+      }
+
+      // --------------------------------------------------------
+      // LOAD EXACT ASSESSMENT
+      // --------------------------------------------------------
+
+      const assessment =
+        await getAssessment(
+          assessmentId,
+          userId,
+        );
+
+      const career =
+        assessment.career ||
+        requestedCareer ||
+        "Selected Career";
+
+      // --------------------------------------------------------
+      // CALCULATE SCORE
+      // --------------------------------------------------------
+
+      const calculated =
+        calculateScore(
+          assessment.questions,
+          answers,
+        );
+
+      // --------------------------------------------------------
+      // AGGREGATED SKILL PROFILE
+      // --------------------------------------------------------
+
+      const skillProfile =
+        buildSkillProfile(
+          calculated.questionResults,
+        );
+
+      console.log(
+        "CALCULATED RESULT:",
+        {
+          assessmentId,
+          career,
+          score:
+            calculated.score,
+          totalScore:
+            calculated.totalScore,
+          percentage:
+            calculated.percentage,
+          skillProfile,
+        },
+      );
+
+      // --------------------------------------------------------
+      // AI ANALYSIS
+      // --------------------------------------------------------
+
+      let aiAnalysis: any;
+
+      try {
+        aiAnalysis =
+          await generateAIAnalysis(
+            career,
+            calculated.score,
+            calculated.totalScore,
+            calculated.percentage,
+            skillProfile,
+            calculated.questionResults,
+          );
+      } catch (aiError) {
+        console.error(
+          "GEMINI ANALYSIS ERROR:",
+          aiError,
+        );
+
+        aiAnalysis =
+          fallbackAnalysis(
+            career,
+            calculated.score,
+            calculated.totalScore,
+            calculated.percentage,
+            skillProfile,
+          );
+      }
+
+      // --------------------------------------------------------
+      // FORCE REAL VALUES
+      // --------------------------------------------------------
+
+      aiAnalysis.overall_level =
+        calculated.overallLevel;
+
+      aiAnalysis.score =
+        calculated.score;
+
+      aiAnalysis.total_score =
+        calculated.totalScore;
+
+      aiAnalysis.percentage =
+        calculated.percentage;
+
+      aiAnalysis.skill_profile =
+        skillProfile;
+
+      aiAnalysis.answer_details =
+        calculated.questionResults;
+
+      // --------------------------------------------------------
+      // SAVE RESULT
+      // --------------------------------------------------------
+
+      const savedResult =
+        await saveAssessmentResult(
+          userId,
+          career,
+          calculated.score,
+          calculated.totalScore,
+          calculated.percentage,
+          answers,
+          aiAnalysis,
+        );
+
+      // --------------------------------------------------------
+      // MARK COMPLETE
+      // --------------------------------------------------------
+
+      try {
+        await markCompleted(
+          assessmentId,
+        );
+      } catch (completionError) {
+        console.warn(
+          "Could not mark assessment completed:",
+          completionError,
+        );
+      }
+
+      // --------------------------------------------------------
+      // SUCCESS
+      // --------------------------------------------------------
+
+      console.log(
+        "ASSESSMENT RESULT SAVED:",
+        savedResult.id,
+      );
+
+      return jsonResponse({
+        success: true,
+
+        result_id:
+          savedResult.id,
+
+        assessment_id:
+          assessmentId,
+
+        career,
+
+        score:
+          calculated.score,
+
+        total_score:
+          calculated.totalScore,
+
+        percentage:
+          calculated.percentage,
+
+        analysis:
+          aiAnalysis,
+
+        question_results:
+          calculated.questionResults,
+
+        skill_profile:
+          skillProfile,
+      });
+    } catch (error) {
+      console.error(
+        "ANALYZE ASSESSMENT ERROR:",
+        error,
+      );
+
+      return jsonResponse(
+        {
+          success: false,
+
+          error:
+            error instanceof Error
+              ? error.message
+              : "Assessment analysis failed.",
+        },
+        500,
+      );
+    }
+  },
+);

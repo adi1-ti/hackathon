@@ -1,4 +1,3 @@
-
 /* =========================================
    STUDENT PROFILE
    COMPACT OCEANIC / DEEP OCEAN TEAL UI
@@ -21,7 +20,10 @@
     #daf0f0;
 
   color: #0a2f2f;
-  padding-bottom: 35px;
+
+  padding-bottom: 40px;
+
+  font-family: "DM Sans", sans-serif;
 }
 
 /* =========================================
@@ -30,16 +32,23 @@
 
 .profile-header {
   width: min(1380px, calc(100% - 40px));
+
   min-height: 62px;
 
   margin: 12px auto 0;
+
   padding: 0 20px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
 
+  box-sizing: border-box;
+
   border: 1px solid rgba(10, 47, 47, 0.13);
+
   border-radius: 13px;
 
   background: rgba(229, 242, 242, 0.78);
@@ -51,6 +60,75 @@
 }
 
 /* =========================================
+   BRAND
+========================================= */
+
+.profile-header .auth-brand {
+  display: flex;
+
+  align-items: center;
+
+  gap: 11px;
+
+  color: #0a2f2f;
+
+  text-decoration: none;
+}
+
+.profile-header .brand-mark {
+  width: 38px;
+
+  height: 38px;
+
+  display: grid;
+
+  place-items: center;
+
+  border: 1px solid #1d5e5e;
+
+  border-radius: 10px;
+
+  color: #1d5e5e;
+
+  background: rgba(183, 214, 214, 0.48);
+
+  box-shadow:
+    0 6px 18px rgba(10, 47, 47, 0.06);
+
+  transition: 0.2s ease;
+}
+
+.profile-header .auth-brand:hover .brand-mark {
+  transform: translateY(-1px);
+
+  background: rgba(183, 214, 214, 0.68);
+}
+
+.profile-header .brand-name {
+  display: block;
+
+  color: #0a2f2f;
+
+  font-size: 13px;
+
+  letter-spacing: 3px;
+
+  font-weight: 700;
+}
+
+.profile-header .brand-subtitle {
+  display: block;
+
+  margin-top: 1px;
+
+  color: #1d5e5e;
+
+  font-size: 9px;
+
+  letter-spacing: 4px;
+}
+
+/* =========================================
    PROGRESS
 ========================================= */
 
@@ -58,12 +136,15 @@
   color: #648585;
 
   font-size: 8px;
+
   letter-spacing: 2px;
+
   font-weight: 700;
 }
 
 .profile-progress-text span {
   margin-left: 7px;
+
   color: #1d5e5e;
 }
 
@@ -76,12 +157,13 @@
 
   margin: 0 auto;
 
-  padding: 28px 0 30px;
+  padding: 34px 0 30px;
 
   display: flex;
+
   flex-direction: column;
 
-  gap: 28px;
+  gap: 30px;
 }
 
 /* =========================================
@@ -93,11 +175,11 @@
 
   display: grid;
 
-  grid-template-columns: 0.8fr 1.2fr;
+  grid-template-columns: 0.85fr 1.15fr;
 
   align-items: center;
 
-  gap: 45px;
+  gap: 55px;
 }
 
 /* =========================================
@@ -105,7 +187,7 @@
 ========================================= */
 
 .sidebar-title {
-  max-width: 430px;
+  max-width: 470px;
 }
 
 .sidebar-kicker {
@@ -119,17 +201,17 @@
 }
 
 .sidebar-title h2 {
-  margin-top: 12px;
+  margin: 12px 0 0;
 
   font-family: "Playfair Display", Georgia, serif;
 
-  font-size: clamp(32px, 3.5vw, 48px);
+  font-size: clamp(34px, 3.8vw, 50px);
 
   line-height: 0.98;
 
   font-weight: 600;
 
-  letter-spacing: -1.3px;
+  letter-spacing: -1.4px;
 
   color: #0a2f2f;
 }
@@ -139,15 +221,15 @@
 }
 
 .sidebar-title p {
-  max-width: 400px;
+  max-width: 430px;
 
-  margin-top: 12px;
+  margin: 14px 0 0;
 
   color: #4f7777;
 
   font-size: 11px;
 
-  line-height: 1.7;
+  line-height: 1.75;
 }
 
 /* =========================================
@@ -165,7 +247,9 @@
 
   gap: 12px;
 
-  padding: 16px 18px;
+  padding: 17px 19px;
+
+  box-sizing: border-box;
 
   border: 1px solid rgba(10, 47, 47, 0.11);
 
@@ -174,6 +258,9 @@
   background: rgba(229, 242, 242, 0.62);
 
   backdrop-filter: blur(10px);
+
+  box-shadow:
+    0 8px 25px rgba(10, 47, 47, 0.025);
 }
 
 .setup-step {
@@ -184,13 +271,16 @@
   gap: 9px;
 
   flex: 1;
+
+  min-width: 0;
 }
 
 .step-icon {
-  width: 34px;
-  height: 34px;
+  width: 35px;
 
-  flex: 0 0 34px;
+  height: 35px;
+
+  flex: 0 0 35px;
 
   display: grid;
 
@@ -226,6 +316,8 @@
   font-size: 6px;
 
   letter-spacing: 1.5px;
+
+  white-space: nowrap;
 }
 
 .setup-step.active small {
@@ -244,18 +336,23 @@
   font-size: 14px;
 
   font-weight: 500;
+
+  white-space: nowrap;
 }
 
 .setup-step.active strong {
   color: #0a2f2f;
 }
 
-/* STEP CONNECTOR */
+/* =========================================
+   STEP CONNECTOR
+========================================= */
 
 .setup-line {
   flex: 0 0 30px;
 
   width: 30px;
+
   height: 1px;
 
   background:
@@ -267,7 +364,7 @@
 }
 
 /* =========================================
-   RIGHT CONTENT
+   FORM SECTION
 ========================================= */
 
 .profile-form-section {
@@ -279,17 +376,18 @@
 ========================================= */
 
 .form-heading {
+  max-width: 720px;
+
   text-align: center;
 
-  margin: 0 auto 22px;
-
-  max-width: 720px;
+  margin: 0 auto 26px;
 }
 
 .profile-kicker {
   display: flex;
 
   align-items: center;
+
   justify-content: center;
 
   gap: 8px;
@@ -305,17 +403,18 @@
 
 .profile-kicker span {
   width: 22px;
+
   height: 1px;
 
   background: #1d5e5e;
 }
 
 .form-heading h1 {
-  margin-top: 11px;
+  margin: 11px 0 0;
 
   font-family: "Playfair Display", Georgia, serif;
 
-  font-size: clamp(35px, 4vw, 50px);
+  font-size: clamp(36px, 4vw, 52px);
 
   line-height: 0.98;
 
@@ -333,13 +432,13 @@
 .form-heading p {
   max-width: 620px;
 
-  margin: 11px auto 0;
+  margin: 12px auto 0;
 
   color: #4f7777;
 
   font-size: 11px;
 
-  line-height: 1.65;
+  line-height: 1.7;
 }
 
 /* =========================================
@@ -348,31 +447,26 @@
 
 .profile-form {
   width: 100%;
-}
 
-/* =========================================
-   CATEGORY GRID
-========================================= */
-
-.profile-form-section .profile-form {
   display: grid;
 
-  grid-template-columns:
-    repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1fr 1fr;
 
-  gap: 13px;
+  gap: 15px;
 }
 
 /* =========================================
-   CATEGORY CARD
+   PROFILE CARD
 ========================================= */
 
 .profile-review-card {
   width: 100%;
 
-  padding: 17px;
+  padding: 19px;
 
   margin: 0;
+
+  box-sizing: border-box;
 
   border: 1px solid rgba(10, 47, 47, 0.12);
 
@@ -407,6 +501,14 @@
 }
 
 /* =========================================
+   INTEREST CARD
+========================================= */
+
+.profile-form > .profile-review-card:first-child {
+  grid-column: 1 / -1;
+}
+
+/* =========================================
    CARD HEADER
 ========================================= */
 
@@ -417,9 +519,9 @@
 
   align-items: flex-start;
 
-  gap: 10px;
+  gap: 12px;
 
-  margin-bottom: 13px;
+  margin-bottom: 15px;
 }
 
 .review-kicker {
@@ -434,39 +536,78 @@
   font-weight: 700;
 }
 
+/* =========================================
+   OPTIONAL LABEL ROW
+========================================= */
+
+.review-kicker-row {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+.optional-label {
+  display: inline-flex;
+
+  align-items: center;
+
+  padding: 3px 7px;
+
+  border: 1px solid rgba(29, 94, 94, 0.15);
+
+  border-radius: 20px;
+
+  background: rgba(29, 94, 94, 0.05);
+
+  color: #6b9292;
+
+  font-size: 6px;
+
+  font-weight: 700;
+
+  letter-spacing: 1px;
+
+  white-space: nowrap;
+}
+
 .profile-review-header h2 {
-  margin-top: 5px;
+  margin: 5px 0 0;
 
   color: #0a2f2f;
 
   font-family: "Playfair Display", Georgia, serif;
 
-  font-size: 16px;
+  font-size: 18px;
 
-  line-height: 1.1;
+  line-height: 1.15;
 
   font-weight: 600;
 }
 
 .review-description {
-  margin-top: 4px;
+  max-width: 620px;
+
+  margin: 5px 0 0;
 
   color: #6b9292;
 
-  font-size: 7.5px;
+  font-size: 8px;
 
-  line-height: 1.45;
+  line-height: 1.55;
 }
 
 /* =========================================
-   CATEGORY ICON
+   CARD ICON
 ========================================= */
 
 .review-header-icon {
-  width: 31px;
-  height: 31px;
+  width: 34px;
 
-  flex: 0 0 31px;
+  height: 34px;
+
+  flex: 0 0 34px;
 
   display: grid;
 
@@ -476,30 +617,128 @@
 
   border: 1px solid rgba(29, 94, 94, 0.17);
 
-  border-radius: 8px;
+  border-radius: 9px;
 
   background: rgba(29, 94, 94, 0.05);
 }
 
 /* =========================================
-   SKILL GRID
+   FORM FIELDS
+========================================= */
+
+.profile-field-group {
+  margin-top: 13px;
+}
+
+.profile-field-group label {
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: #315f5f;
+
+  font-size: 9px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.3px;
+}
+
+.profile-field-group input,
+.profile-field-group textarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 10px 12px;
+
+  border: 1px solid rgba(10, 47, 47, 0.12);
+
+  border-radius: 8px;
+
+  outline: none;
+
+  color: #0a2f2f;
+
+  background: rgba(245, 251, 251, 0.65);
+
+  font-family: "DM Sans", sans-serif;
+
+  font-size: 10px;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.profile-field-group input {
+  min-height: 43px;
+}
+
+.profile-field-group textarea {
+  min-height: 62px;
+
+  resize: vertical;
+
+  line-height: 1.5;
+}
+
+.profile-field-group input::placeholder,
+.profile-field-group textarea::placeholder {
+  color: #8aa7a7;
+}
+
+.profile-field-group input:hover,
+.profile-field-group textarea:hover {
+  border-color: rgba(29, 94, 94, 0.28);
+}
+
+.profile-field-group input:focus,
+.profile-field-group textarea:focus {
+  border-color: rgba(29, 94, 94, 0.55);
+
+  background: #f5fbfb;
+
+  box-shadow:
+    0 0 0 3px rgba(183, 214, 214, 0.32);
+}
+
+/* =========================================
+   INTEREST GRID
 ========================================= */
 
 .interest-grid {
   display: grid;
 
   grid-template-columns:
-    repeat(2, minmax(0, 1fr));
+    repeat(3, minmax(0, 1fr));
 
-  gap: 6px;
+  gap: 7px;
 }
 
 /* =========================================
-   SKILL BUTTON
+   SKILL SELECTION WRAPPER
+========================================= */
+
+.skill-selection-wrapper {
+  width: 100%;
+
+  position: relative;
+}
+
+.skill-selection-wrapper.selected {
+  z-index: 10;
+}
+
+/* =========================================
+   INTEREST CHIP
 ========================================= */
 
 .interest-chip {
-  min-height: 37px;
+  width: 100%;
+
+  min-height: 39px;
 
   display: flex;
 
@@ -507,13 +746,15 @@
 
   justify-content: space-between;
 
-  gap: 6px;
+  gap: 7px;
 
-  padding: 7px 9px;
+  padding: 8px 10px;
 
-  border: 1px solid rgba(10, 47, 47, 0.1);
+  box-sizing: border-box;
 
-  border-radius: 7px;
+  border: 1px solid rgba(10, 47, 47, 0.10);
+
+  border-radius: 8px;
 
   color: #4f7777;
 
@@ -521,7 +762,7 @@
 
   font-family: "DM Sans", sans-serif;
 
-  font-size: 7.5px;
+  font-size: 8px;
 
   font-weight: 500;
 
@@ -529,7 +770,12 @@
 
   cursor: pointer;
 
-  transition: 0.18s ease;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 .interest-chip:hover {
@@ -539,7 +785,10 @@
 
   color: #0a2f2f;
 
-  background: rgba(245, 251, 251, 0.85);
+  background: rgba(245, 251, 251, 0.88);
+
+  box-shadow:
+    0 5px 14px rgba(10, 47, 47, 0.035);
 }
 
 .interest-chip.selected {
@@ -550,17 +799,196 @@
   background:
     linear-gradient(
       135deg,
-      rgba(79, 143, 143, 0.13),
-      rgba(29, 94, 94, 0.055)
+      rgba(79, 143, 143, 0.14),
+      rgba(29, 94, 94, 0.06)
     );
 
   box-shadow:
-    inset 0 0 12px rgba(29, 94, 94, 0.02);
+    inset 0 0 12px rgba(29, 94, 94, 0.02),
+    0 4px 12px rgba(29, 94, 94, 0.04);
 }
 
 .interest-chip.selected span {
   font-weight: 700;
 }
+
+/* =========================================
+   CHIP RIGHT SIDE
+========================================= */
+
+.interest-chip-right {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: flex-end;
+
+  gap: 4px;
+
+  flex-shrink: 0;
+}
+
+.interest-chip-right svg {
+  color: #1d5e5e;
+}
+
+/* =========================================
+   DROPDOWN CHEVRON
+========================================= */
+
+.skill-dropdown-chevron {
+  flex-shrink: 0;
+
+  transition:
+    transform 0.2s ease;
+}
+
+.skill-dropdown-chevron.open {
+  transform: rotate(180deg);
+}
+
+/* =========================================
+   SKILL LEVEL BOX
+========================================= */
+
+.skill-level-box {
+  width: 100%;
+
+  margin-top: 5px;
+
+  padding: 7px 8px;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 8px;
+
+  border: 1px solid rgba(29, 94, 94, 0.16);
+
+  border-radius: 7px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(245, 251, 251, 0.90),
+      rgba(229, 242, 242, 0.78)
+    );
+
+  box-shadow:
+    0 5px 15px rgba(10, 47, 47, 0.045);
+
+  animation:
+    skill-level-open 0.18s ease;
+}
+
+.skill-level-box > span {
+  color: #648585;
+
+  font-size: 7px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.6px;
+
+  white-space: nowrap;
+}
+
+/* =========================================
+   LEVEL SELECT
+========================================= */
+
+.skill-level-box select {
+  min-width: 108px;
+
+  height: 27px;
+
+  padding: 0 7px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(29, 94, 94, 0.18);
+
+  border-radius: 6px;
+
+  outline: none;
+
+  color: #1d5e5e;
+
+  background: #f5fbfb;
+
+  font-family: "DM Sans", sans-serif;
+
+  font-size: 7.5px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  appearance: auto;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.skill-level-box select:hover {
+  border-color: rgba(29, 94, 94, 0.35);
+}
+
+.skill-level-box select:focus {
+  border-color: rgba(29, 94, 94, 0.55);
+
+  box-shadow:
+    0 0 0 2px rgba(183, 214, 214, 0.32);
+}
+
+/* =========================================
+   SKILL LEVEL ANIMATION
+========================================= */
+
+@keyframes skill-level-open {
+  from {
+    opacity: 0;
+
+    transform: translateY(-3px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0);
+  }
+}
+
+/* =========================================
+   SKILL WRAPPER + SELECTED CHIP
+========================================= */
+
+.skill-selection-wrapper.selected
+  .interest-chip {
+  border-color: rgba(29, 94, 94, 0.55);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(79, 143, 143, 0.14),
+      rgba(29, 94, 94, 0.06)
+    );
+}
+
+.skill-selection-wrapper.selected
+  .interest-chip:hover {
+  border-color: rgba(29, 94, 94, 0.65);
+}
+
+/* =========================================
+   CHIP ICON
+========================================= */
 
 .interest-chip svg {
   flex-shrink: 0;
@@ -569,71 +997,151 @@
 }
 
 /* =========================================
-   CONTINUE BUTTON
+   CURRENT SKILLS CARD
 ========================================= */
 
-.profile-continue {
+.skills-message-card {
+  grid-column: 1 / -1;
+}
+
+/* =========================================
+   SKILLS MESSAGE BOX
+========================================= */
+
+.skills-message-wrapper {
+  width: 100%;
+
+  min-height: 150px;
+
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 11px;
+
+  padding: 14px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(10, 47, 47, 0.12);
+
+  border-radius: 11px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(245, 251, 251, 0.72),
+      rgba(229, 242, 242, 0.55)
+    );
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.skills-message-wrapper > svg {
+  flex-shrink: 0;
+
+  margin-top: 3px;
+
+  color: #6b9292;
+}
+
+.skills-message-wrapper:focus-within {
+  border-color: rgba(29, 94, 94, 0.55);
+
+  background: #f5fbfb;
+
+  box-shadow:
+    0 0 0 3px rgba(183, 214, 214, 0.30),
+    0 8px 22px rgba(10, 47, 47, 0.035);
+}
+
+.skills-message-wrapper textarea {
+  width: 100%;
+
+  min-height: 118px;
+
+  padding: 0;
+
+  resize: vertical;
+
+  border: 0;
+
+  outline: 0;
+
+  color: #0a2f2f;
+
+  background: transparent;
+
+  font-family: "DM Sans", sans-serif;
+
+  font-size: 11px;
+
+  line-height: 1.7;
+}
+
+.skills-message-wrapper textarea::placeholder {
+  color: #8aa7a7;
+}
+
+.skills-message-hint {
+  margin: 8px 2px 0;
+
+  color: #8aa7a7;
+
+  font-size: 7px;
+
+  letter-spacing: 0.3px;
+}
+
+/* =========================================
+   ERROR
+========================================= */
+
+.profile-form-error {
   grid-column: 1 / -1;
 
   width: 100%;
 
-  min-height: 45px;
+  padding: 12px 15px;
 
-  margin-top: 2px;
+  box-sizing: border-box;
+
+  border: 1px solid rgba(150, 70, 70, 0.18);
+
+  border-radius: 9px;
+
+  background: rgba(170, 90, 90, 0.06);
+
+  color: #8a4b4b;
+
+  font-size: 10px;
+
+  line-height: 1.5;
+
+  text-align: center;
+}
+
+/* =========================================
+   SELECTION FOOTER
+========================================= */
+
+.profile-selection-footer {
+  grid-column: 1 / -1;
+
+  width: 100%;
 
   display: flex;
 
-  align-items: center;
+  flex-direction: column;
 
-  justify-content: center;
+  align-items: stretch;
 
-  gap: 9px;
+  gap: 10px;
 
-  border: 1px solid #1d5e5e;
-
-  border-radius: 8px;
-
-  color: #e5f2f2;
-
-  background:
-    linear-gradient(
-      135deg,
-      #4f8f8f,
-      #1d5e5e
-    );
-
-  font-family: "DM Sans", sans-serif;
-
-  font-size: 9px;
-
-  font-weight: 700;
-
-  letter-spacing: 0.5px;
-
-  cursor: pointer;
-
-  transition: 0.2s ease;
-}
-
-.profile-continue:hover:not(:disabled) {
-  transform: translateY(-2px);
-
-  box-shadow:
-    0 10px 25px rgba(29, 94, 94, 0.2);
-}
-
-.profile-continue:disabled {
-  opacity: 0.55;
-
-  cursor: not-allowed;
-}
-
-.profile-continue svg {
-  transition: transform 0.2s ease;
-}
-
-.profile-continue:hover:not(:disabled) svg {
-  transform: translateX(4px);
+  margin-top: 2px;
 }
 
 /* =========================================
@@ -641,11 +1149,9 @@
 ========================================= */
 
 .selected-count {
-  grid-column: 1 / -1;
-
   width: fit-content;
 
-  margin: -3px 0 -2px;
+  margin: 0;
 
   padding: 6px 10px;
 
@@ -662,6 +1168,96 @@
   font-weight: 700;
 
   letter-spacing: 0.6px;
+}
+
+/* =========================================
+   CONTINUE BUTTON
+========================================= */
+
+.profile-continue {
+  width: 100%;
+
+  min-height: 50px;
+
+  margin: 0;
+
+  padding: 0 20px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 12px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #1d5e5e;
+
+  border-radius: 9px;
+
+  color: #e5f2f2;
+
+  background:
+    linear-gradient(
+      135deg,
+      #4f8f8f,
+      #1d5e5e
+    );
+
+  font-family: "DM Sans", sans-serif;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  letter-spacing: 1px;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 8px 22px rgba(29, 94, 94, 0.14);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.profile-continue:hover:not(:disabled) {
+  transform: translateY(-2px);
+
+  background:
+    linear-gradient(
+      135deg,
+      #5fa1a1,
+      #1d5e5e
+    );
+
+  box-shadow:
+    0 12px 30px rgba(29, 94, 94, 0.22);
+}
+
+.profile-continue:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.profile-continue:disabled {
+  opacity: 0.55;
+
+  cursor: not-allowed;
+
+  box-shadow: none;
+}
+
+.profile-continue svg {
+  transition: transform 0.2s ease;
+}
+
+.profile-continue:hover:not(:disabled) svg {
+  transform: translateX(4px);
 }
 
 /* =========================================
@@ -685,6 +1281,8 @@
 }
 
 .profile-loading p {
+  margin: 0;
+
   color: #648585;
 
   font-size: 12px;
@@ -699,20 +1297,31 @@
   .profile-sidebar {
     grid-template-columns: 1fr;
 
-    gap: 20px;
+    gap: 22px;
   }
 
   .sidebar-title {
-    max-width: 650px;
+    max-width: 700px;
   }
 
   .sidebar-title p {
-    max-width: 570px;
+    max-width: 620px;
   }
 
-  .profile-form-section .profile-form {
+  .profile-form {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-form > .profile-review-card:first-child,
+  .skills-message-card,
+  .profile-form-error,
+  .profile-selection-footer {
+    grid-column: 1 / -1;
+  }
+
+  .interest-grid {
     grid-template-columns:
-      repeat(2, minmax(0, 1fr));
+      repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -736,12 +1345,24 @@
     border-radius: 11px;
   }
 
+  .profile-header .brand-name {
+    font-size: 12px;
+
+    letter-spacing: 2.5px;
+  }
+
+  .profile-header .brand-subtitle {
+    font-size: 8px;
+
+    letter-spacing: 3px;
+  }
+
   .profile-main {
     width: calc(100% - 24px);
 
-    padding-top: 22px;
+    padding-top: 24px;
 
-    gap: 22px;
+    gap: 24px;
   }
 
   .sidebar-title h2 {
@@ -788,26 +1409,71 @@
     font-size: 10px;
   }
 
-  .profile-form-section .profile-form {
+  .profile-form {
     grid-template-columns: 1fr;
+
+    gap: 13px;
   }
 
   .profile-review-card {
-    padding: 15px;
+    padding: 16px;
   }
 
   .profile-review-header h2 {
     font-size: 17px;
   }
 
+  .interest-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 6px;
+  }
+
   .interest-chip {
-    min-height: 38px;
+    min-height: 39px;
 
     font-size: 8px;
   }
 
+  .skills-message-wrapper {
+    min-height: 145px;
+
+    padding: 12px;
+  }
+
+  .skills-message-wrapper textarea {
+    min-height: 115px;
+
+    font-size: 10px;
+  }
+
+  .selected-count {
+    font-size: 7px;
+  }
+
   .profile-continue {
-    min-height: 45px;
+    min-height: 48px;
+
+    font-size: 9px;
+
+    letter-spacing: 0.8px;
+  }
+
+  .skill-level-box {
+    padding: 7px 8px;
+  }
+
+  .skill-level-box select {
+    min-width: 115px;
+
+    height: 29px;
+
+    font-size: 8px;
+  }
+
+  .skill-level-box > span {
+    font-size: 7px;
   }
 }
 
@@ -832,6 +1498,30 @@
   .interest-grid {
     grid-template-columns: 1fr;
   }
+
+  .skills-message-wrapper {
+    min-height: 140px;
+  }
+
+  .skill-level-box {
+    flex-direction: column;
+
+    align-items: stretch;
+
+    gap: 6px;
+  }
+
+  .skill-level-box select {
+    width: 100%;
+
+    min-width: 0;
+  }
+
+  .profile-continue {
+    width: 100%;
+
+    min-height: 48px;
+  }
 }
 
 /* =========================================
@@ -843,7 +1533,18 @@
   .profile-review-card,
   .interest-chip,
   .profile-continue,
-  .step-icon {
+  .step-icon,
+  .skills-message-wrapper,
+  .profile-field-group input,
+  .profile-field-group textarea,
+  .skill-dropdown-chevron,
+  .skill-level-box {
     transition: none;
+
+    animation: none;
+  }
+
+  .profile-header .auth-brand:hover .brand-mark {
+    transform: none;
   }
 }

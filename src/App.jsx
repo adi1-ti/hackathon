@@ -7,6 +7,7 @@ import StudentProfile from "./pages/StudentProfile";
 import CareerSelection from "./pages/CareerSelection";
 import Assessment from "./pages/Assessment";
 import Dashboard from "./pages/Dashboard";
+import CareerDetails from "./pages/CareerDetails";
 
 import "./App.css";
 
@@ -38,6 +39,11 @@ function App() {
         <Route
           path="/dashboard"
           element={<Dashboard />}
+        />
+
+        <Route
+          path="/career-details"
+          element={<CareerDetails />}
         />
       </Routes>
     </BrowserRouter>

@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import {
   ArrowLeft,
   ArrowRight,
@@ -8,27 +9,28 @@ import {
   Loader2,
   Sparkles,
 } from "lucide-react";
+
 import { supabase } from "../supabaseClient";
 import "./assessment.css";
 
 function Assessment() {
   const navigate = useNavigate();
+  const hasLoadedAssessment = useRef(false);
 
   const [user, setUser] = useState(null);
   const [career, setCareer] = useState("");
+  const [assessmentId, setAssessmentId] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [currentQuestion, setCurrentQuestion] = useState(0);
-
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  // ============================================================
-  // LOAD ASSESSMENT
-  // ============================================================
-
   useEffect(() => {
+    if (hasLoadedAssessment.current) return;
+
+    hasLoadedAssessment.current = true;
     loadAssessment();
   }, []);
 
@@ -37,18 +39,12 @@ function Assessment() {
     setError("");
 
     try {
-      // ----------------------------------------------------------
-      // 1. GET LOGGED-IN USER
-      // ----------------------------------------------------------
-
       const {
         data: { user: currentUser },
         error: authError,
       } = await supabase.auth.getUser();
 
-      if (authError) {
-        throw authError;
-      }
+      if (authError) throw authError;
 
       if (!currentUser) {
         navigate("/login");
@@ -57,94 +53,161 @@ function Assessment() {
 
       setUser(currentUser);
 
-      // ----------------------------------------------------------
-      // 2. GET STUDENT CAREER
-      // ----------------------------------------------------------
+      const { data: student, error: studentError } =
+        await supabase
+          .from("students")
+          .select("selected_career")
+          .eq("auth_id", currentUser.id)
+          .maybeSingle();
 
-      const {
-        data: student,
-        error: studentError,
-      } = await supabase
-        .from("students")
-        .select("selected_career")
-        .eq("auth_id", currentUser.id)
-        .maybeSingle();
-
-      if (studentError) {
-        throw studentError;
-      }
+      if (studentError) throw studentError;
 
       if (!student?.selected_career) {
-        setError(
+        throw new Error(
           "No career has been selected yet. Please choose a career first."
         );
-        return;
       }
 
       const selectedCareer = student.selected_career;
-
       setCareer(selectedCareer);
 
-      // ----------------------------------------------------------
-      // 3. GET 5 QUESTIONS
-      // ----------------------------------------------------------
+      const { data: generatedData, error: generatedError } =
+        await supabase.functions.invoke("generate-assessment", {
+          body: {
+            student_id: currentUser.id,
+            user_id: currentUser.id,
+            career: selectedCareer,
+          },
+        });
 
-      const {
-        data: assessmentQuestions,
-        error: assessmentError,
-      } = await supabase
-        .from("assessments")
-        .select("*")
-        .ilike("career", selectedCareer)
-        .limit(5);
-
-      if (assessmentError) {
-        throw assessmentError;
-      }
-
-      if (
-        !assessmentQuestions ||
-        assessmentQuestions.length === 0
-      ) {
-        setError(
-          `No assessment questions were found for ${selectedCareer}.`
+      if (generatedError) {
+        throw new Error(
+          generatedError.message ||
+            "Unable to generate assessment."
         );
-        return;
       }
 
-      // Only 5 questions for hackathon prototype
-      setQuestions(assessmentQuestions.slice(0, 5));
+      if (!generatedData?.success) {
+        throw new Error(
+          generatedData?.error ||
+            "AI failed to generate the assessment."
+        );
+      }
+
+      if (!Array.isArray(generatedData.questions)) {
+        throw new Error(
+          "AI response does not contain questions."
+        );
+      }
+
+      if (generatedData.questions.length !== 5) {
+        throw new Error(
+          `AI generated ${generatedData.questions.length} questions instead of 5.`
+        );
+      }
+
+      /*
+       * IMPORTANT:
+       * generate-assessment creates the database assessment.
+       * Accept assessment_id OR id from the Edge Function.
+       */
+      const generatedAssessmentId =
+        generatedData.assessment_id ??
+        generatedData.id ??
+        null;
+
+      if (!generatedAssessmentId) {
+        throw new Error(
+          "Assessment ID was not returned by the assessment generator."
+        );
+      }
+
+      /*
+       * Normalize questions.
+       *
+       * The database/function may return questions without IDs.
+       * We create stable IDs for the React frontend.
+       */
+      const normalizedQuestions =
+        generatedData.questions.map((question, index) => ({
+          ...question,
+          id:
+            question.id ??
+            question.question_id ??
+            `question-${index + 1}`,
+          question: String(question.question ?? ""),
+          option_a: String(question.option_a ?? ""),
+          option_b: String(question.option_b ?? ""),
+          option_c: String(question.option_c ?? ""),
+          option_d: String(question.option_d ?? ""),
+          difficulty:
+            question.difficulty ?? "Intermediate",
+          skill_mapping:
+            question.skill_mapping ?? "General",
+          time_minutes:
+            question.time_minutes ?? 2,
+        }));
+
+      normalizedQuestions.forEach((question, index) => {
+        const required = [
+          "id",
+          "question",
+          "option_a",
+          "option_b",
+          "option_c",
+          "option_d",
+        ];
+
+        for (const field of required) {
+          if (!question[field]) {
+            throw new Error(
+              `Question ${index + 1} is missing ${field}.`
+            );
+          }
+        }
+      });
+
+      /*
+       * THIS IS THE IMPORTANT FIX:
+       * Store the actual database assessment ID.
+       */
+      setAssessmentId(String(generatedAssessmentId));
+
+      setQuestions(normalizedQuestions);
+      console.log(
+  "ASSESSMENT QUESTIONS FULL:",
+  JSON.stringify(normalizedQuestions, null, 2)
+);
+      setCurrentQuestion(0);
+      setAnswers({});
     } catch (err) {
-      console.error("Assessment loading error:", err);
+      console.error(
+        "ASSESSMENT LOADING ERROR:",
+        err
+      );
 
       setError(
-        err.message ||
-          "Something went wrong while loading your assessment."
+        err?.message ||
+          "Something went wrong while generating your assessment."
       );
     } finally {
       setLoading(false);
     }
   }
 
-  // ============================================================
-  // ANSWER HANDLING
-  // ============================================================
-
   function handleAnswer(questionId, option) {
-    setAnswers((previousAnswers) => ({
-      ...previousAnswers,
-      [questionId]: option,
+    setAnswers((previous) => ({
+      ...previous,
+      [String(questionId)]: option,
     }));
 
     setError("");
   }
 
-  // ============================================================
-  // NEXT QUESTION
-  // ============================================================
-
   function handleNext() {
     const question = questions[currentQuestion];
+
+    if (!question) return;
 
     if (!answers[question.id]) {
       setError(
@@ -156,37 +219,41 @@ function Assessment() {
     setError("");
 
     if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(
-        (previousQuestion) => previousQuestion + 1
-      );
+      setCurrentQuestion((previous) => previous + 1);
     }
   }
-
-  // ============================================================
-  // PREVIOUS QUESTION
-  // ============================================================
 
   function handlePrevious() {
     setError("");
 
     if (currentQuestion > 0) {
-      setCurrentQuestion(
-        (previousQuestion) => previousQuestion - 1
-      );
+      setCurrentQuestion((previous) => previous - 1);
     }
   }
 
-  // ============================================================
-  // SUBMIT ASSESSMENT
-  // ============================================================
-
-  async function handleSubmit() {
+ async function handleSubmit() {
   const unanswered = questions.find(
     (question) => !answers[question.id]
   );
 
   if (unanswered) {
-    setError("Please answer all questions before submitting.");
+    setError(
+      "Please answer all questions before submitting."
+    );
+    return;
+  }
+
+  if (!assessmentId) {
+    setError(
+      "Assessment ID is missing. Please reload the assessment."
+    );
+    return;
+  }
+
+  if (!user) {
+    setError(
+      "User session is missing. Please log in again."
+    );
     return;
   }
 
@@ -194,122 +261,78 @@ function Assessment() {
   setError("");
 
   try {
-    // ============================================================
-    // 1. CALCULATE SCORE
-    // ============================================================
+    const submittedQuestions = questions.map(
+      (question) => ({
+        id: question.id,
+        question: question.question,
+        option_a: question.option_a,
+        option_b: question.option_b,
+        option_c: question.option_c,
+        option_d: question.option_d,
 
-    let score = 0;
+        /*
+         * IMPORTANT:
+         * The generated assessment stored in Supabase
+         * contains the correct answer.
+         *
+         * It is sent only to your Edge Function,
+         * NOT displayed in the UI.
+         */
+        correct_answer:
+          question.correct_answer,
 
-    questions.forEach((question) => {
-      if (answers[question.id] === question.correct_answer) {
-        score += Number(question.max_score || 5);
-      }
-    });
+        max_score:
+          Number(question.max_score ?? 5),
 
-    const totalScore = questions.reduce(
-      (total, question) =>
-        total + Number(question.max_score || 5),
-      0
-    );
+        difficulty:
+          question.difficulty ??
+          "Intermediate",
 
-    const percentage =
-      totalScore > 0
-        ? Math.round((score / totalScore) * 100)
-        : 0;
-
-    console.log("SCORE:", score);
-    console.log("TOTAL SCORE:", totalScore);
-    console.log("PERCENTAGE:", percentage);
-
-    // ============================================================
-    // 2. BUILD SKILL PROFILE
-    // ============================================================
-
-    const skillStats = {};
-
-    questions.forEach((question) => {
-      const skill =
-        question.skill_mapping ||
-        question.core_skill ||
-        "General";
-
-      if (!skillStats[skill]) {
-        skillStats[skill] = {
-          correct: 0,
-          total: 0,
-        };
-      }
-
-      skillStats[skill].total += 1;
-
-      if (
-        answers[question.id] ===
-        question.correct_answer
-      ) {
-        skillStats[skill].correct += 1;
-      }
-    });
-
-    const skillProfile = Object.entries(skillStats).map(
-      ([skill, stats]) => ({
-        skill,
-        total: stats.total,
-        correct: stats.correct,
-        percentage:
-          stats.total > 0
-            ? Math.round(
-                (stats.correct / stats.total) * 100
-              )
-            : 0,
+        skill_mapping:
+          question.skill_mapping ??
+          "General",
       })
     );
 
-    console.log("SKILL PROFILE:", skillProfile);
+    console.log(
+      "SUBMITTING ASSESSMENT:",
+      {
+        assessmentId,
+        userId: user.id,
+        career,
+        answers,
+        questions: submittedQuestions,
+      }
+    );
 
-    // ============================================================
-    // 3. CALL AI FUNCTION
-    // ============================================================
+    const {
+      data: aiData,
+      error: aiError,
+    } = await supabase.functions.invoke(
+      "analyze-assessment",
+      {
+        body: {
+          assessment_id: assessmentId,
+          user_id: user.id,
+          career,
 
-    console.log("STARTING AI ANALYSIS...");
+          /*
+           * USER ANSWERS
+           */
+          answers,
 
-    const { data: aiData, error: aiError } =
-      await supabase.functions.invoke(
-        "analyze-assessment",
-        {
-          body: {
-            career,
-            score,
-            totalScore,
-            percentage,
-            skillProfile,
-
-            questions: questions.map((question) => ({
-              id: question.id,
-
-              question: question.question,
-
-              skill:
-                question.skill_mapping ||
-                question.core_skill ||
-                "General",
-
-              correctAnswer:
-                question.correct_answer,
-
-              userAnswer:
-                answers[question.id],
-            })),
-          },
-        }
-      );
-
-    // ============================================================
-    // 4. HANDLE AI ERROR
-    // ============================================================
+          /*
+           * QUESTIONS + CORRECT ANSWERS
+           */
+          questions:
+            submittedQuestions,
+        },
+      }
+    );
 
     if (aiError) {
       console.error(
-        "AI FUNCTION ERROR:",
+        "ANALYZE FUNCTION ERROR:",
         aiError
       );
 
@@ -320,134 +343,48 @@ function Assessment() {
     }
 
     console.log(
-      "AI FUNCTION RESPONSE:",
+      "ANALYZE FUNCTION RESPONSE:",
       aiData
     );
 
-    // ============================================================
-    // 5. BUILD COMPLETE AI ANALYSIS
-    // ============================================================
-
-    let completeAIAnalysis = {
-      skill_profile: skillProfile,
-    };
-
-    if (
-      aiData &&
-      aiData.success &&
-      aiData.analysis
-    ) {
-      completeAIAnalysis = {
-        ...aiData.analysis,
-
-        // ALWAYS keep our calculated skill profile
-        skill_profile: skillProfile,
-      };
-    }
-
-    console.log(
-      "COMPLETE AI ANALYSIS:",
-      JSON.stringify(
-        completeAIAnalysis,
-        null,
-        2
-      )
-    );
-
-    // ============================================================
-    // 6. INSERT EVERYTHING ONCE
-    // ============================================================
-
-    console.log(
-      "SAVING COMPLETE RESULT TO DATABASE..."
-    );
-
-    const { data: result, error: resultError } =
-      await supabase
-        .from("assessment_results")
-        .insert({
-          user_id: user.id,
-
-          career: career,
-
-          score: score,
-
-          total_score: totalScore,
-
-          percentage: percentage,
-
-          answers: answers,
-
-          ai_analysis: completeAIAnalysis,
-        })
-        .select()
-        .single();
-
-    if (resultError) {
-      console.error(
-        "DATABASE INSERT ERROR:",
-        resultError
-      );
-
-      throw resultError;
-    }
-
-    console.log(
-      "ASSESSMENT SAVED SUCCESSFULLY:",
-      result
-    );
-
-    // ============================================================
-    // 7. VERIFY WHAT WAS ACTUALLY SAVED
-    // ============================================================
-
-    console.log(
-      "SAVED AI ANALYSIS:",
-      JSON.stringify(
-        result?.ai_analysis,
-        null,
-        2
-      )
-    );
-
-    // ============================================================
-    // 8. UPDATE STUDENTS TABLE
-    // ============================================================
-
-    const { error: studentUpdateError } =
-      await supabase
-        .from("students")
-        .update({
-          assessment_score: score,
-          assessment_total: totalScore,
-          assessment_percentage: percentage,
-        })
-        .eq("auth_id", user.id);
-
-    if (studentUpdateError) {
-      console.error(
-        "STUDENT UPDATE ERROR:",
-        studentUpdateError
+    if (!aiData?.success) {
+      throw new Error(
+        aiData?.error ||
+          "Assessment analysis failed."
       );
     }
 
-    // ============================================================
-    // 9. SAVE RESULT ID
-    // ============================================================
-
-    if (result?.id) {
+    /*
+     * Save returned result ID.
+     */
+    if (aiData.result_id) {
       localStorage.setItem(
         "latestAssessmentResultId",
-        result.id
+        String(aiData.result_id)
       );
     }
 
-    // ============================================================
-    // 10. GO TO DASHBOARD
-    // ============================================================
+    /*
+     * Useful debugging.
+     */
+    console.log(
+      "FINAL SCORE:",
+      aiData.score,
+      "/",
+      aiData.totalScore
+    );
+
+    console.log(
+      "FINAL PERCENTAGE:",
+      aiData.percentage
+    );
+
+    console.log(
+      "FINAL SKILL PROFILE:",
+      aiData.skillProfile
+    );
 
     navigate("/dashboard");
-
   } catch (err) {
     console.error(
       "ASSESSMENT SUBMISSION ERROR:",
@@ -455,16 +392,13 @@ function Assessment() {
     );
 
     setError(
-      err.message ||
+      err?.message ||
         "Something went wrong while submitting your assessment."
     );
   } finally {
     setSubmitting(false);
   }
 }
-  // ============================================================
-  // LOADING SCREEN
-  // ============================================================
 
   if (loading) {
     return (
@@ -476,30 +410,21 @@ function Assessment() {
           />
 
           <p>
-            Preparing your assessment...
+            AI is preparing your personalized assessment...
           </p>
         </div>
       </div>
     );
   }
 
-  // ============================================================
-  // ERROR SCREEN
-  // ============================================================
-
-  if (
-    error &&
-    questions.length === 0
-  ) {
+  if (error && questions.length === 0) {
     return (
       <div className="assessment-page">
         <div className="assessment-container">
           <div className="assessment-error-screen">
             <Sparkles size={30} />
 
-            <h1>
-              Assessment unavailable
-            </h1>
+            <h1>Assessment unavailable</h1>
 
             <p>{error}</p>
 
@@ -507,14 +432,13 @@ function Assessment() {
               type="button"
               onClick={() =>
                 navigate(
-                  "/career-selection"
+                  "/career-recommendations"
                 )
               }
               className="assessment-back-button"
             >
               <ArrowLeft size={17} />
-
-              Back to Career Selection
+              Back to Career Recommendations
             </button>
           </div>
         </div>
@@ -526,12 +450,11 @@ function Assessment() {
     return null;
   }
 
-  // ============================================================
-  // CURRENT QUESTION
-  // ============================================================
+  const question = questions[currentQuestion];
 
-  const question =
-    questions[currentQuestion];
+  if (!question) {
+    return null;
+  }
 
   const selectedAnswer =
     answers[question.id];
@@ -561,25 +484,15 @@ function Assessment() {
     },
   ];
 
-  // ============================================================
-  // UI
-  // ============================================================
-
   return (
     <div className="assessment-page">
       <div className="assessment-container">
-
-        {/* ======================================================
-            HEADER
-        ====================================================== */}
 
         <header className="assessment-header">
           <button
             type="button"
             className="assessment-logo"
-            onClick={() =>
-              navigate("/")
-            }
+            onClick={() => navigate("/")}
           >
             <Sparkles size={19} />
           </button>
@@ -590,7 +503,7 @@ function Assessment() {
           </div>
 
           <div className="assessment-header-right">
-            <span>ASSESSMENT</span>
+            <span>AI ASSESSMENT</span>
 
             <strong>
               {currentQuestion + 1} /{" "}
@@ -598,10 +511,6 @@ function Assessment() {
             </strong>
           </div>
         </header>
-
-        {/* ======================================================
-            PROGRESS
-        ====================================================== */}
 
         <div className="assessment-progress">
           <div
@@ -612,14 +521,10 @@ function Assessment() {
           />
         </div>
 
-        {/* ======================================================
-            INTRO
-        ====================================================== */}
-
         <section className="assessment-intro">
           <div className="assessment-kicker">
             <span />
-            CAREER SKILL ASSESSMENT
+            AI CAREER SKILL ASSESSMENT
           </div>
 
           <h1>
@@ -629,18 +534,12 @@ function Assessment() {
           </h1>
 
           <p>
-            Answer these questions to help us
-            understand your current skill level.
+            These questions were generated specifically
+            for your career profile.
           </p>
         </section>
 
-        {/* ======================================================
-            QUESTION CARD
-        ====================================================== */}
-
         <section className="assessment-card">
-
-          {/* QUESTION META */}
 
           <div className="assessment-question-meta">
             <div>
@@ -656,7 +555,7 @@ function Assessment() {
             <div className="assessment-meta-right">
               <span className="assessment-difficulty">
                 {question.difficulty ||
-                  "Medium"}
+                  "Intermediate"}
               </span>
 
               <span className="assessment-time">
@@ -669,21 +568,14 @@ function Assessment() {
             </div>
           </div>
 
-          {/* SKILL */}
-
           <div className="assessment-skill">
             {question.skill_mapping ||
-              question.core_skill ||
               "General"}
           </div>
-
-          {/* QUESTION */}
 
           <h2 className="assessment-question">
             {question.question}
           </h2>
-
-          {/* OPTIONS */}
 
           <div className="assessment-options">
             {options.map((option) => {
@@ -706,6 +598,7 @@ function Assessment() {
                       option.key
                     )
                   }
+                  disabled={submitting}
                 >
                   <span className="assessment-option-letter">
                     {option.key}
@@ -725,15 +618,11 @@ function Assessment() {
             })}
           </div>
 
-          {/* ERROR */}
-
           {error && (
             <div className="assessment-inline-error">
               {error}
             </div>
           )}
-
-          {/* NAVIGATION */}
 
           <div className="assessment-navigation">
 
@@ -744,12 +633,9 @@ function Assessment() {
                 currentQuestion === 0 ||
                 submitting
               }
-              onClick={
-                handlePrevious
-              }
+              onClick={handlePrevious}
             >
               <ArrowLeft size={17} />
-
               Previous
             </button>
 
@@ -762,10 +648,7 @@ function Assessment() {
                 onClick={handleNext}
               >
                 Next Question
-
-                <ArrowRight
-                  size={17}
-                />
+                <ArrowRight size={17} />
               </button>
             ) : (
               <button
@@ -778,17 +661,18 @@ function Assessment() {
                   ? "Analyzing..."
                   : "Submit Assessment"}
 
-                {!submitting && (
+                {submitting ? (
+                  <Loader2
+                    size={17}
+                    className="assessment-spinner"
+                  />
+                ) : (
                   <Check size={17} />
                 )}
               </button>
             )}
           </div>
         </section>
-
-        {/* ======================================================
-            FOOTER
-        ====================================================== */}
 
         <div className="assessment-footer">
           <span>
@@ -800,10 +684,13 @@ function Assessment() {
             {questions.length * 5}
           </span>
         </div>
-
       </div>
     </div>
   );
 }
 
+/*
+ * THIS MUST BE THE LAST LINE.
+ * App.jsx is importing Assessment as a default export.
+ */
 export default Assessment;

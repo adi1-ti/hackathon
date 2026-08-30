@@ -2739,6 +2739,265 @@ button {
     margin: auto 0;
   }
 }
+/* =========================================================
+   CUSTOM LOGIN POPUP
+========================================================= */
+
+.custom-popup-overlay {
+  position: fixed;
+  inset: 0;
+
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(10, 47, 47, 0.18);
+
+  backdrop-filter: blur(7px);
+
+  animation: popup-overlay-in 0.25s ease;
+}
+
+.custom-popup {
+  position: relative;
+
+  width: min(420px, 100%);
+
+  display: flex;
+  align-items: flex-start;
+
+  gap: 16px;
+
+  padding: 25px 27px 22px;
+
+  border: 1px solid rgba(29, 94, 94, 0.22);
+
+  border-radius: 18px;
+
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(183, 214, 214, 0.35),
+      transparent 45%
+    ),
+    rgba(245, 251, 251, 0.97);
+
+  backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 25px 70px rgba(10, 47, 47, 0.20);
+
+  animation: popup-in 0.3s ease;
+}
+
+.popup-success {
+  border-color: rgba(29, 94, 94, 0.30);
+}
+
+.popup-error {
+  border-color: rgba(150, 80, 80, 0.25);
+}
+
+/* =========================================================
+   POPUP ICON
+========================================================= */
+
+.popup-icon {
+  width: 46px;
+  height: 46px;
+
+  flex: 0 0 46px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  color: #1d5e5e;
+
+  background: rgba(183, 214, 214, 0.45);
+
+  border: 1px solid rgba(29, 94, 94, 0.20);
+}
+
+.popup-error .popup-icon {
+  color: #8c5555;
+
+  background: rgba(180, 90, 90, 0.08);
+
+  border-color: rgba(180, 90, 90, 0.20);
+}
+
+/* =========================================================
+   POPUP CONTENT
+========================================================= */
+
+.popup-content {
+  flex: 1;
+
+  padding-right: 20px;
+}
+
+.popup-kicker {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #1d5e5e;
+
+  font-size: 8px;
+
+  font-weight: 700;
+
+  letter-spacing: 2.5px;
+}
+
+.popup-error .popup-kicker {
+  color: #8c5555;
+}
+
+.popup-content h3 {
+  margin: 0;
+
+  color: #0a2f2f;
+
+  font-family: "Playfair Display", Georgia, serif;
+
+  font-size: 23px;
+
+  font-weight: 600;
+
+  line-height: 1.2;
+}
+
+.popup-content p {
+  margin: 7px 0 0;
+
+  color: #4f7777;
+
+  font-size: 11px;
+
+  line-height: 1.65;
+}
+
+/* =========================================================
+   CLOSE BUTTON
+========================================================= */
+
+.popup-close {
+  position: absolute;
+
+  top: 13px;
+  right: 13px;
+
+  width: 28px;
+  height: 28px;
+
+  display: grid;
+  place-items: center;
+
+  border: 0;
+  border-radius: 50%;
+
+  color: #648585;
+
+  background: transparent;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.popup-close:hover {
+  color: #0a2f2f;
+
+  background: rgba(29, 94, 94, 0.08);
+}
+
+/* =========================================================
+   BOTTOM ACCENT
+========================================================= */
+
+.popup-line {
+  position: absolute;
+
+  left: 27px;
+  right: 27px;
+  bottom: 0;
+
+  height: 2px;
+
+  border-radius: 10px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      #4f8f8f,
+      #1d5e5e,
+      transparent
+    );
+}
+
+/* =========================================================
+   POPUP ANIMATIONS
+========================================================= */
+
+@keyframes popup-overlay-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popup-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+  .custom-popup {
+    padding: 22px 21px 20px;
+  }
+
+  .popup-icon {
+    width: 42px;
+    height: 42px;
+
+    flex-basis: 42px;
+  }
+
+  .popup-content h3 {
+    font-size: 20px;
+  }
+
+  .popup-content p {
+    font-size: 10px;
+  }
+
+  .popup-line {
+    left: 21px;
+    right: 21px;
+  }
+}
 
 
 
