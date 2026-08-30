@@ -1,80 +1,330 @@
 # CareerPath AI
 
-> **Your journey. Your skills. Your future.**
+> **Your skills. Your potential. Your career path.**
 
-CareerPath AI is an AI-powered career development platform that helps students understand their current skills, identify career-specific skill gaps, and create a personalized path toward their target career.
+CareerPath AI is an AI-powered career guidance and skill development platform designed to help students discover suitable career paths based on their **current skills and proficiency levels**, evaluate their readiness for a selected career, identify skill gaps, and receive a personalized action plan for becoming career-ready.
 
-Instead of simply suggesting a career, CareerPath AI answers a more practical question:
-
-> **What should I learn and build to become career-ready?**
-
-🔗 **Live Demo:** https://careerpathai-phoenix.netlify.app/
+Unlike traditional career platforms that provide generic career suggestions, CareerPath AI follows a **skill-first and assessment-driven approach**.
 
 ---
 
-## How It Works
+## Problem
+
+Students often know that they want a successful career but struggle to answer:
+
+* Which career is actually suitable for my current skills?
+* How strong am I in the skills required for that career?
+* What skills am I missing?
+* Am I actually ready for this career?
+* What should I learn next?
+* What projects should I build to improve my profile?
+* How can I structure my preparation?
+
+Most career platforms provide broad career information or generic recommendations. CareerPath AI aims to bridge this gap by combining **student skill profiles, proficiency levels, career requirements, AI-generated assessments, and personalized skill-gap analysis**.
+
+---
+
+## Solution
+
+CareerPath AI creates a personalized career journey for each student.
+
+The system first collects the student's skills along with their **proficiency level — Beginner, Intermediate, or Advanced**. Based on this profile, the system recommends **two suitable career paths**.
+
+The student can then explore a recommended career, understand what the career involves, and take an AI-generated assessment designed specifically around the skills required for that career.
+
+The assessment results are analyzed to determine:
+
+* Overall career readiness
+* Skill-wise performance
+* Strengths
+* Weaknesses
+* Skill gaps
+* Recommended improvements
+* Practical project ideas
+* A personalized 4-week learning roadmap
+
+This transforms CareerPath AI from a simple career recommendation system into a **career-readiness and skill-development platform**.
+
+---
+
+# How CareerPath AI Works
 
 ```text
-Register / Login
-       ↓
-Student Profile
-       ↓
-Select Target Career
-       ↓
-Take 5-MCQ Assessment
-       ↓
-Calculate Score + Skill Profile
-       ↓
-AI Analysis using Gemini
-       ↓
-Strengths + Weaknesses + Skill Gaps
-       ↓
-Recommendations + 4-Week Roadmap
-       ↓
-Project Recommendations
-       ↓
-Personalized Dashboard
-       ↓
-Learn → Build → Retake → Improve
+                    ┌──────────────────────┐
+                    │   Register / Login   │
+                    └──────────┬───────────┘
+                               ↓
+                    ┌──────────────────────┐
+                    │   Student Profile    │
+                    │                      │
+                    │ Degree / Background  │
+                    │ Skills                │
+                    │ Skill Proficiency    │
+                    │ Beginner /            │
+                    │ Intermediate /        │
+                    │ Advanced              │
+                    └──────────┬───────────┘
+                               ↓
+                    ┌──────────────────────┐
+                    │ Career Recommendation│
+                    │                      │
+                    │   Recommended 2       │
+                    │   Career Paths        │
+                    └──────────┬───────────┘
+                               ↓
+                    ┌──────────────────────┐
+                    │   Explore Career     │
+                    │                      │
+                    │ Career Description   │
+                    │ Required Skills      │
+                    │ Career Overview       │
+                    └──────────┬───────────┘
+                               ↓
+                    ┌──────────────────────┐
+                    │ AI-Generated         │
+                    │ Career Assessment    │
+                    │                      │
+                    │ Career-specific      │
+                    │ Questions            │
+                    └──────────┬───────────┘
+                               ↓
+                    ┌──────────────────────┐
+                    │ Assessment Results   │
+                    │                      │
+                    │ Score + Skill Profile│
+                    │ Career Readiness     │
+                    └──────────┬───────────┘
+                               ↓
+              ┌────────────────┴────────────────┐
+              ↓                                 ↓
+     ┌──────────────────┐             ┌──────────────────┐
+     │ Skill Gap        │             │ Strengths &      │
+     │ Analysis         │             │ Weaknesses       │
+     └────────┬─────────┘             └────────┬─────────┘
+              └────────────────┬────────────────┘
+                               ↓
+                    ┌──────────────────────┐
+                    │ AI Recommendations  │
+                    └──────────┬───────────┘
+                               ↓
+              ┌────────────────┴────────────────┐
+              ↓                                 ↓
+     ┌──────────────────┐             ┌──────────────────┐
+     │ 4-Week Learning  │             │ Project          │
+     │ Roadmap          │             │ Recommendations  │
+     └────────┬─────────┘             └────────┬─────────┘
+              └────────────────┬────────────────┘
+                               ↓
+                    ┌──────────────────────┐
+                    │ Personalized        │
+                    │ Student Dashboard   │
+                    └──────────────────────┘
 ```
 
-### Workflow
+---
 
-1. The student registers or logs in.
-2. The student completes their profile and selects a target career.
-3. A career-specific 5-question assessment evaluates relevant skills.
-4. The system calculates the overall score and skill-wise performance.
-5. Assessment data is sent to a Supabase Edge Function.
-6. Gemini AI analyzes the student's performance.
-7. The system generates strengths, weaknesses, skill gaps, recommendations, a 4-week roadmap, and project suggestions.
-8. Results are stored in Supabase and displayed on the student's dashboard.
+# Key Features
+
+### 1. Personalized Student Profile
+
+Students create a profile containing their academic background and current technical skills.
+
+Each selected skill can be assigned a proficiency level:
+
+* **Beginner**
+* **Intermediate**
+* **Advanced**
+
+This provides the recommendation system with more meaningful information than simply knowing whether a student has a particular skill.
 
 ---
 
-## Key Features
+### 2. Personalized Career Recommendation
 
-* **Career Selection** — Choose a target career and its required skills.
-* **Career-Specific Assessment** — 5 MCQs designed around relevant career skills.
-* **Skill-Wise Analysis** — See performance for individual skills instead of only an overall score.
-* **AI Career Analysis** — Gemini identifies strengths, weaknesses, and skill gaps.
-* **Personalized Recommendations** — Get actionable next steps based on assessment performance.
-* **4-Week Learning Roadmap** — Receive a structured weekly learning plan.
-* **AI Project Recommendations** — Get project ideas aligned with career goals and skill gaps.
-* **Personalized Dashboard** — View assessment results and AI-generated insights in one place.
-* **Retake Assessment** — Reassess skills after learning and practice.
-* **Explore Other Careers** — Try a different career path and assessment.
-* **Secure Authentication** — User authentication is handled through Supabase Auth.
+CareerPath AI analyzes the student's selected skills and proficiency levels against available career requirements.
+
+Instead of overwhelming the student with a long list of careers, the platform recommends **two relevant career paths** that best match their current skill profile.
+
+This helps students focus on realistic and relevant career options.
 
 ---
 
-## AI Integration
+### 3. Career Exploration
 
-CareerPath AI uses **Google Gemini** to transform assessment results into personalized career guidance.
+After receiving recommendations, students can explore a career before committing to its assessment.
+
+The career information provides context such as:
+
+* Career description
+* Role overview
+* Required skills
+* Relevant technical areas
+* What the student needs to develop
+
+This allows the student to understand **why the career may be suitable for them**.
+
+---
+
+### 4. AI-Generated Career Assessment
+
+Once a student selects a career, CareerPath AI generates a **career-specific assessment using AI**.
+
+The questions are based on the skills and knowledge relevant to the selected career rather than using a generic test for every student.
+
+The assessment evaluates the student's understanding of the skills required for their chosen career path.
+
+---
+
+### 5. Career Readiness Analysis
+
+After completing the assessment, the system evaluates the student's performance and calculates their career readiness.
+
+The results include:
+
+* Overall score
+* Readiness level
+* Skill-wise performance
+* Strong areas
+* Weak areas
+* Areas requiring improvement
+
+---
+
+### 6. Skill Profile
+
+The assessment performance is converted into a skill-wise profile.
+
+Students can identify which skills they already understand and which areas require additional preparation.
+
+This provides more useful information than an overall assessment score alone.
+
+---
+
+### 7. Skill Gap Analysis
+
+CareerPath AI identifies the difference between the student's current capabilities and the skills required for their selected career.
+
+The system categorizes areas into:
+
+* **Strengths**
+* **Weaknesses**
+* **Skill Gaps**
+* **Skills to Improve**
+
+This helps students understand exactly what they need to work on.
+
+---
+
+### 8. AI-Powered Recommendations
+
+Based on the assessment results and identified skill gaps, AI generates personalized recommendations.
+
+Recommendations focus on actionable improvements rather than generic career advice.
+
+---
+
+### 9. Personalized 4-Week Roadmap
+
+CareerPath AI generates a structured **4-week learning roadmap** based on the student's identified weaknesses and skill gaps.
+
+The roadmap provides a progressive learning path:
 
 ```text
-Assessment Results
+Week 1
+Foundation & Weak Areas
+        ↓
+Week 2
+Skill Development
+        ↓
+Week 3
+Practical Application
+        ↓
+Week 4
+Projects & Career Preparation
+```
+
+The roadmap is personalized according to the student's assessment performance rather than being identical for every user.
+
+---
+
+### 10. Project Recommendations
+
+Learning becomes more effective when students apply their knowledge.
+
+CareerPath AI recommends practical projects aligned with:
+
+* Selected career
+* Skill gaps
+* Weak areas
+* Current proficiency
+* Learning roadmap
+
+These projects help students convert theoretical knowledge into portfolio-ready experience.
+
+---
+
+### 11. Personalized Dashboard
+
+The dashboard brings the complete analysis together in one place.
+
+It can display:
+
+* Career readiness
+* Overall assessment score
+* Skill profile
+* Strengths
+* Weaknesses
+* Skill gaps
+* AI recommendations
+* 4-week roadmap
+* Recommended projects
+
+The dashboard acts as the student's personalized career development center.
+
+---
+
+### 12. Retake & Improve
+
+Students can continue learning, improve their weak areas, and reassess their readiness.
+
+```text
+Assess
+  ↓
+Identify Gaps
+  ↓
+Learn
+  ↓
+Build Projects
+  ↓
+Reassess
+  ↓
+Improve Career Readiness
+```
+
+This makes CareerPath AI a continuous improvement system rather than a one-time career test.
+
+---
+
+# AI Integration
+
+CareerPath AI uses **Google Gemini** for intelligent career and assessment analysis.
+
+The AI pipeline works as follows:
+
+```text
+Student Skill Profile
         +
-Career
+Selected Career
+        +
+Required Career Skills
+        ↓
+AI Assessment Generation
+        ↓
+Career-Specific Questions
+        ↓
+Student Responses
+        ↓
+Assessment Score
         +
 Skill Profile
         ↓
@@ -84,40 +334,115 @@ Google Gemini
         ↓
 Structured AI Analysis
         ↓
-Strengths
-Weaknesses
-Skill Gaps
-Recommendations
-4-Week Roadmap
-Projects
+┌──────────────────────────────┐
+│ Career Readiness             │
+│ Strengths                    │
+│ Weaknesses                   │
+│ Skill Gaps                   │
+│ Recommendations              │
+│ 4-Week Roadmap               │
+│ Project Suggestions          │
+└──────────────────────────────┘
         ↓
-Student Dashboard
+Personalized Dashboard
 ```
 
-The AI output is structured so that the frontend can dynamically display the generated insights.
+The AI-generated output is structured so that the frontend can dynamically display the results.
 
 ---
 
-## Technology Stack
+# Technology Stack
 
-| Layer               | Technology                      |
-| ------------------- | ------------------------------- |
-| Frontend            | React.js, Vite, JavaScript, CSS |
-| Routing             | React Router                    |
-| Icons               | Lucide React                    |
-| Authentication      | Supabase Auth                   |
-| Database            | Supabase PostgreSQL             |
-| Backend             | Node.js, Express.js             |
-| AI                  | Google Gemini                   |
-| AI Runtime          | Supabase Edge Functions         |
-| Data                | Career and assessment datasets  |
-| Version Control     | Git & GitHub                    |
-| Frontend Deployment | Netlify                         |
-| Backend Deployment  | Render                          |
+| Layer               | Technology              |
+| ------------------- | ----------------------- |
+| Frontend            | React.js                |
+| Build Tool          | Vite                    |
+| Language            | JavaScript              |
+| Styling             | CSS                     |
+| Routing             | React Router            |
+| Icons               | Lucide React            |
+| Authentication      | Supabase Auth           |
+| Database            | Supabase PostgreSQL     |
+| Backend             | Node.js / Express.js    |
+| Serverless AI Layer | Supabase Edge Functions |
+| AI                  | Google Gemini           |
+| Data                | Career & Skill Dataset  |
+| Version Control     | Git & GitHub            |
+| Frontend Deployment | Netlify                 |
+| Backend Deployment  | Render                  |
 
 ---
 
-## Project Structure
+# System Architecture
+
+```text
+                         ┌─────────────────┐
+                         │   React + Vite  │
+                         │    Frontend     │
+                         └────────┬────────┘
+                                  │
+                    ┌─────────────┴─────────────┐
+                    ↓                           ↓
+            ┌───────────────┐           ┌───────────────┐
+            │ Supabase Auth │           │ Application    │
+            │               │           │ Backend/API    │
+            └───────┬───────┘           └───────┬───────┘
+                    │                           │
+                    └─────────────┬─────────────┘
+                                  ↓
+                         ┌─────────────────┐
+                         │    Supabase     │
+                         │   PostgreSQL    │
+                         └────────┬────────┘
+                                  │
+                    ┌─────────────┴─────────────┐
+                    ↓                           ↓
+            Student Profiles             Assessment Data
+            Career Data                  Assessment Results
+                    │                           │
+                    └─────────────┬─────────────┘
+                                  ↓
+                     ┌────────────────────────┐
+                     │ Supabase Edge Function │
+                     │   analyze-assessment   │
+                     └────────────┬───────────┘
+                                  ↓
+                         ┌─────────────────┐
+                         │   Gemini AI     │
+                         └────────┬────────┘
+                                  ↓
+                     ┌────────────────────────┐
+                     │ Structured AI Analysis │
+                     └────────────┬───────────┘
+                                  ↓
+                         ┌─────────────────┐
+                         │ Student         │
+                         │ Dashboard       │
+                         └─────────────────┘
+```
+
+---
+
+# Database
+
+CareerPath AI uses Supabase PostgreSQL for storing application data.
+
+Core data includes:
+
+* Student profiles
+* Student skills and proficiency levels
+* Career information
+* Career skill requirements
+* Assessment questions
+* Assessment responses
+* Assessment results
+* AI-generated analysis
+
+Assessment results and AI analysis are stored so the dashboard can display previously generated results without unnecessarily repeating AI processing.
+
+---
+
+# Project Structure
 
 ```text
 hackathon/
@@ -153,29 +478,35 @@ hackathon/
 
 ---
 
-## Getting Started
+# Getting Started
 
-### Prerequisites
+## Prerequisites
+
+Make sure you have:
 
 * Node.js 18+
 * npm
-* Supabase project
-* Google Gemini API key
+* A Supabase project
+* Google Gemini API access
 
-### 1. Clone the Repository
+---
+
+## Clone the Repository
 
 ```bash
 git clone https://github.com/adi1-ti/hackathon.git
 cd hackathon
 ```
 
-### 2. Install Frontend Dependencies
+---
+
+## Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 3. Install Backend Dependencies
+If using the backend:
 
 ```bash
 cd backend
@@ -183,7 +514,9 @@ npm install
 cd ..
 ```
 
-### 4. Configure Environment Variables
+---
+
+## Environment Variables
 
 Create a `.env` file in the project root:
 
@@ -192,160 +525,155 @@ VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_publishable_key
 ```
 
-Create `backend/.env`:
+For the backend, configure the required Supabase environment variables.
+
+Configure the Gemini API key as a Supabase Edge Function secret:
 
 ```env
-SUPABASE_URL=your_supabase_project_url
-SUPABASE_SERVICE_KEY=your_server_side_key
-PORT=5000
-```
-
-Configure the Gemini API key as a **Supabase Edge Function secret**:
-
-```text
 GEMINI_API_KEY=your_gemini_api_key
 ```
 
-**Never commit real API keys or service-role keys to GitHub.**
+**Never commit API keys, Supabase service-role keys, or other secrets to GitHub.**
 
-### 5. Set Up Supabase
+---
 
-Create the required database tables and import the career and assessment data.
+## Run the Application
 
-The application uses Supabase for:
-
-* Authentication
-* Student data
-* Career data
-* Assessment results
-* AI-generated analysis
-
-### 6. Run the Backend
-
-From the `backend` directory:
-
-```bash
-node server.js
-```
-
-### 7. Run the Frontend
-
-From the project root, open another terminal:
+Start the frontend:
 
 ```bash
 npm run dev
+```
+
+For the backend, if required:
+
+```bash
+cd backend
+node server.js
 ```
 
 Open the local URL provided by Vite.
 
 ---
 
-## System Architecture
+# User Journey
+
+The complete student journey is:
 
 ```text
-                  React + Vite
-                       │
-              ┌────────┴────────┐
-              ↓                 ↓
-        Supabase Auth       Application API
-              │                 │
-              └────────┬────────┘
-                       ↓
-               Supabase Database
-                       │
-                       ↓
-             Assessment Results
-                       │
-                       ↓
-          Supabase Edge Function
-             analyze-assessment
-                       │
-                       ↓
-                 Gemini AI
-                       │
-                       ↓
-             Structured AI Output
-                       │
-                       ↓
-              Supabase Database
-                       │
-                       ↓
-             React Dashboard
+1. Register / Login
+          ↓
+2. Create Student Profile
+          ↓
+3. Select Skills
+          ↓
+4. Set Skill Proficiency
+   Beginner / Intermediate / Advanced
+          ↓
+5. Receive 2 Career Recommendations
+          ↓
+6. Explore Career
+          ↓
+7. View Career Description & Required Skills
+          ↓
+8. Select Career
+          ↓
+9. Take AI-Generated Assessment
+          ↓
+10. Receive Career Readiness Result
+          ↓
+11. View Skill Profile
+          ↓
+12. Identify Strengths & Weaknesses
+          ↓
+13. Identify Skill Gaps
+          ↓
+14. Receive AI Recommendations
+          ↓
+15. Get 4-Week Learning Roadmap
+          ↓
+16. Get Project Recommendations
+          ↓
+17. Follow → Learn → Build → Reassess
 ```
 
 ---
 
-## 💡 What Makes CareerPath AI Different?
+# What Makes CareerPath AI Different?
 
-Most career platforms focus on **career discovery**.
-
-CareerPath AI focuses on **career development**.
-
-```text
-Current Skills
-      ↓
-Skill Assessment
-      ↓
-Skill Gaps
-      ↓
-Personalized Learning
-      ↓
-Portfolio Projects
-      ↓
-Career Readiness
-```
-
-The platform connects assessment results directly to actionable learning and project recommendations.
+| Traditional Career Platforms   | CareerPath AI                             |
+| ------------------------------ | ----------------------------------------- |
+| Generic career suggestions     | Personalized career recommendations       |
+| Primarily interest-based       | Skills + proficiency-based                |
+| Large number of career options | Focused recommendation of 2 careers       |
+| Static career information      | Career exploration + readiness assessment |
+| Generic assessments            | Career-specific AI-generated assessments  |
+| Overall score only             | Skill-wise performance analysis           |
+| Shows career options           | Identifies career readiness               |
+| Generic learning advice        | Personalized skill-gap recommendations    |
+| One-size-fits-all roadmap      | Personalized 4-week roadmap               |
+| Limited practical guidance     | Career-aligned project recommendations    |
+| One-time recommendation        | Learn → Build → Reassess cycle            |
 
 ---
 
-## Expected Impact
+# Future Scope
 
-CareerPath AI helps students:
+CareerPath AI can be extended with:
 
-* Understand their current skill level.
-* Identify strengths and weaknesses.
-* Discover important skill gaps.
-* Follow a structured learning plan.
-* Build relevant portfolio projects.
-* Make more informed career decisions.
-
----
-
-## Future Scope
-
-Potential future improvements include:
-
-* Larger and adaptive assessments.
-* Progress tracking across multiple attempts.
-* Resume analysis.
-* Job and internship matching.
-* Learning-resource recommendations.
-* More career paths.
-* Conversational AI career mentoring.
+* Real-time job market analysis
+* Job-role and internship matching
+* Resume and portfolio analysis
+* Progress tracking across multiple assessments
+* Adaptive assessments based on previous performance
+* More detailed career readiness scoring
+* Learning resource recommendations
+* AI career chatbot
+* Industry-specific skill benchmarks
+* Personalized certification recommendations
+* Multi-career comparison
+* Continuous career progression tracking
 
 ---
 
-## Hackathon
+# Project Vision
 
-Built for **TigmaMinds Acadamy Hackathon**.
+CareerPath AI aims to move career guidance from:
 
-**Challenge/Theme:** Education & Future Learning — Career & Skill Development
+> **“Which career should I choose?”**
+
+to:
+
+> **“Where am I right now, what skills am I missing, and what should I do next to become career-ready?”**
+
+The goal is to give students a **clear, personalized, and actionable path from their current skills to their desired career.**
+
+---
+
+## Live Demo
+
+**CareerPath AI:**
+https://careerpathai-phoenix.netlify.app/
+
+---
+
+## Repository
+
+**GitHub:**
+https://github.com/adi1-ti/hackathon
 
 ---
 
 ## Team
 
-**Team:** PHOENIX
+Built as a hackathon project by a team of 3, combining:
 
-**Members:**
-
-* Aditi Agarwal
-* Shabnam Sultana
-* Pangkita Thakuria
+* Frontend Development
+* Backend & Database Engineering
+* AI & Skill-Gap Analysis
 
 ---
 
 ## License
 
-This project was developed as a hackathon prototype.
+This project is developed for educational and hackathon purposes.
